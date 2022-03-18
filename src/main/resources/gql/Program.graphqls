@@ -1,0 +1,36 @@
+"番組取得結果"
+type ProgramResult {
+    "ページインデックス"
+    page: Int!
+
+    "総行数"
+    total: Int!
+
+    "ページのデータ"
+    data: [Program!]!
+}
+
+
+"番組"
+type Program {
+    "プライマリキー"
+    tId: Int!
+
+    "タイトル"
+    title: String!
+
+    "番組開始時期"
+    firstLight: LocalDate
+
+    "アスペクト比"
+    aspect: Int
+
+    "タイトル (短縮)"
+    shorttitle: String!
+
+    "タイトル (読み)"
+    titleyomi: String!
+
+    "タイトル (英語)"
+    titleen: String!
+}

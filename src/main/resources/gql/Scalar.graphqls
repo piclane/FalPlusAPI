@@ -1,0 +1,27 @@
+"""
+Void 型
+"""
+scalar Void
+
+"""
+オフセット付き日時型 ISO-8601形式
+例: 2020-06-04T20:26:32+09:00
+"""
+scalar OffsetDateTime
+
+"""
+ローカル日時型 ISO-8601形式
+例: 2020-06-04T20:26:32
+"""
+scalar LocalDateTime
+
+"""
+ローカルな日付型
+例: 2020-06-04
+"""
+scalar LocalDate
+
+"""
+アップロード型
+"""
+scalar Upload

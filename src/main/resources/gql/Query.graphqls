@@ -1,0 +1,55 @@
+type Query {
+    """
+    放送を取得します
+
+    @param query クエリ
+    @param page ページインデックス
+    """
+    subtitles(query: SubtitleQueryInput, page: Int!): SubtitleResult!
+
+    """
+    番組を取得します
+
+    @param query クエリ
+    @param page ページインデックス
+    """
+    programs(query: ProgramQueryInput, page: Int!): ProgramResult!
+}
+
+"放送クエリ入力"
+input SubtitleQueryInput {
+    "番組ID"
+    tId: Int
+
+    "録画タイプ"
+    recordingType: RecordingType
+
+    """
+    受信可能なチャンネルの放送のみを取得する場合 true
+    受信不能なチャンネルの放送のみを取得する場合 false
+    すべての放送を取得する場合 null
+    """
+    receivableStation: Boolean = true
+
+    """
+    録画が存在する放送を取得する場合 true
+    録画が存在しない放送を取得する場合 false
+    両方の放送を取得する場合 null
+    """
+    hasRecording: Boolean
+
+    "キーワード"
+    keyword: String
+}
+
+"番組クエリ入力"
+input ProgramQueryInput {
+    "番組開始時期の最小値"
+    firstLightAfter: LocalDate
+
+    "番組開始時期の最大値"
+    firstLightBefore: LocalDate
+
+    "キーワード"
+    keyword: String
+}

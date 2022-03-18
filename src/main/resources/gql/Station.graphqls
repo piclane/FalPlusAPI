@@ -1,0 +1,65 @@
+"チャンネル"
+type Station {
+    "チャンネルID"
+    stationId: Int!
+
+    "局名"
+    stationName: String!
+
+    "不明"
+    stationCallSign: String
+
+    "局の URL"
+    stationUri: String
+
+    "ontvcode"
+    ontvcode: String
+
+    "物理チャンネル"
+    digitalCh: Int
+
+    "種別"
+    digitalStationBand: DigitalStationBand
+
+    "EPG 名"
+    epgName: String
+
+    "受信可否"
+    receiving: Boolean!
+
+    "CM 検出閾値"
+    cmEditDetectThreshold: CmEditDetectThreshold
+}
+
+"種別"
+enum DigitalStationBand {
+    "BS デジタル"
+    BS
+
+    "CS デジタル"
+    CS
+
+    "地上波デジタル"
+    TERRESTRIAL
+
+    "ラジオ"
+    RADIO
+
+    "未定義"
+    UNDEFINED
+}
+
+"CM 検出閾値"
+enum CmEditDetectThreshold {
+    "オフ (無効)"
+    OFF
+
+    "弱 (CM判定が緩くなり本編・CMがより多く残りやすい)"
+    LOW
+
+    "中"
+    MEDIUM
+
+    "強 (CM判定が厳しくなり本編・CMがより多くカットされやすい)"
+    HIGH
+}
