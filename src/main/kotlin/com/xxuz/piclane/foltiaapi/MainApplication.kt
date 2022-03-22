@@ -1,11 +1,9 @@
 package com.xxuz.piclane.foltiaapi
 
-import com.xxuz.piclane.foltiaapi.scalar.LocalDateScalar
-import com.xxuz.piclane.foltiaapi.scalar.LocalDateTimeScalar
-import com.xxuz.piclane.foltiaapi.scalar.OffsetDateTimeScalar
-import com.xxuz.piclane.foltiaapi.scalar.VoidScalar
+import com.xxuz.piclane.foltiaapi.scalar.*
 import graphql.kickstart.servlet.apollo.ApolloScalars
 import graphql.kickstart.tools.SchemaParserDictionary
+import graphql.schema.GraphQLScalarType
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
@@ -42,5 +40,8 @@ class MainApplication {
     fun getLocalDateScalar() = LocalDateScalar
 
     @Bean
-    fun getUploadScalar() = ApolloScalars.Upload
+    fun getDurationScalar() = DurationScalar
+
+    @Bean
+    fun getUploadScalar(): GraphQLScalarType = ApolloScalars.Upload
 }

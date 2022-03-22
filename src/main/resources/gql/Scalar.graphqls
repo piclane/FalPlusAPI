@@ -22,6 +22,12 @@ scalar LocalDateTime
 scalar LocalDate
 
 """
-アップロード型
+デュレーション型
+例: PT8H6M12.345S
+"""
+scalar Duration
+
+"""
+ファイルアップロード型
 """
 scalar Upload

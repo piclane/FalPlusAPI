@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.model
 
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
@@ -33,7 +34,7 @@ data class Subtitle(
     /** 開始時刻オフセット (秒) */
     val startOffset: Long,
 
-    /** 放映尺 (分) */
+    /** 放送尺 (分) */
     val lengthMin: Long,
 
     /** TS のファイル名 */
@@ -74,6 +75,12 @@ data class Subtitle(
             tId == -1L -> RecordingType.Keyword
             else -> throw IllegalArgumentException("Illegal tId: $tId")
         }
+
+    /**
+     * 放送の尺
+     */
+    val duration: Duration
+        get() = Duration.ofMinutes(lengthMin)
 
     /**
      * 動画ファイル名を取得します

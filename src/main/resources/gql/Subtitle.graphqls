@@ -74,6 +74,9 @@ type Subtitle {
     "録画タイプ"
     recordingType: RecordingType!
 
+    "放映尺"
+    duration: Duration!
+
     "チャンネル"
     station: Station!
 
