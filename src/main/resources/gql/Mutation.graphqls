@@ -20,6 +20,12 @@ type Mutation {
     deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!): Void
 
     """
+    チャンネルを更新します
+    @param input チャンネル更新入力
+    """
+    updateStation(input: StationUpdateInput): Station
+
+    """
     トランスコードを開始します
     """
     startTranscode: Void

@@ -1,9 +1,12 @@
 package com.xxuz.piclane.foltiaapi.resolver
 
+import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
+import com.xxuz.piclane.foltiaapi.model.Station
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.DeleteSubtitleVideoInput
+import com.xxuz.piclane.foltiaapi.model.vo.StationUpdateInput
 import com.xxuz.piclane.foltiaapi.model.vo.SubtitleUpdateInput
 import com.xxuz.piclane.foltiaapi.model.vo.UploadSubtitleVideoInput
 import graphql.kickstart.tools.GraphQLMutationResolver
@@ -16,6 +19,9 @@ import javax.servlet.http.Part
 class MutationResolver(
     @Autowired
     private val subtitleDao: SubtitleDao,
+
+    @Autowired
+    private val stationDao: StationDao,
 
     @Autowired
     private val foltiaManipulation: FoltiaManipulation,
@@ -32,6 +38,11 @@ class MutationResolver(
         input.forEach {
             foltiaManipulation.deleteSubtitleVideo(it)
         }
+    }
+
+    fun updateStation(input: StationUpdateInput): Station {
+        stationDao.update(input)
+        return stationDao.get(input.stationId) ?: throw IllegalArgumentException("stationId ${input.stationId} does not exist.")
     }
 
     fun startTranscode() {

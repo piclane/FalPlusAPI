@@ -40,6 +40,27 @@ type Station {
     cmEditDetectThreshold: CmEditDetectThreshold
 }
 
+"チャンネル更新入力"
+input StationUpdateInput {
+    "チャンネルID"
+    stationId: Int!
+
+    "局名"
+    stationName: String
+
+    "ontvcode"
+    ontvcode: String
+
+    "物理チャンネル"
+    digitalCh: Int
+
+    "受信可否"
+    receiving: Boolean
+
+    "CM 検出閾値"
+    cmEditDetectThreshold: CmEditDetectThreshold
+}
+
 "種別"
 enum DigitalStationBand {
     "BS デジタル"
