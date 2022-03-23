@@ -1,6 +1,8 @@
 package com.xxuz.piclane.foltiaapi.dao
 
 import com.xxuz.piclane.foltiaapi.model.Station
+import com.xxuz.piclane.foltiaapi.model.vo.StationQueryInput
+import com.xxuz.piclane.foltiaapi.model.vo.StationResult
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
@@ -42,21 +44,37 @@ class StationDao(
         }
 
     /**
-     * 受信可能なチャンネルをすべて取得します
+     * チャンネルを検索します
+     *
+     * @param query クエリ
      */
-    fun findReceivable(): Collection<Station> =
-        jt.query(
+    fun find(query: StationQueryInput?): StationResult {
+        val conditions = mutableListOf(
+            "stationid != 0"
+        )
+        val params = mutableMapOf<String, Any>()
+
+        if(query?.receivableStation != null) {
+            conditions.add("receiving = :receiving")
+            params["receiving"] = if(query.receivableStation) 1 else 0
+        }
+
+        val data = jt.query(
             """
                 SELECT
                     *
                 FROM
                     foltia_station
                 WHERE
-                    receiving = 1
+                    ${conditions.joinToString(" AND ")}
+                ORDER BY stationid
             """,
-            emptyMap<String, Any>(),
+            params,
             RowMapperImpl
         )
+
+        return StationResult(data.size, data)
+    }
 
     /**
      * ResultSet から Station にマッピングする RowMapper

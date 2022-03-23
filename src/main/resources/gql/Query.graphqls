@@ -14,6 +14,13 @@ type Query {
     @param page ページインデックス
     """
     programs(query: ProgramQueryInput, page: Int!): ProgramResult!
+
+    """
+    チャンネルを取得します
+
+    @param query クエリ
+    """
+    stations(query: StationQueryInput): StationResult!
 }
 
 "放送クエリ入力"
@@ -52,4 +59,14 @@ input ProgramQueryInput {
 
     "キーワード"
     keyword: String
+}
+
+"チャンネルクエリ入力"
+input StationQueryInput {
+    """
+    受信可能なチャンネルのみを取得する場合 true
+    受信不能なチャンネルのみを取得する場合 false
+    すべてのチャンネルを取得する場合 null
+    """
+    receivableStation: Boolean = true
 }
