@@ -3,8 +3,6 @@ package com.xxuz.piclane.foltiaapi.dao
 import com.xxuz.piclane.foltiaapi.model.Program
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramQueryInput
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramResult
-import com.xxuz.piclane.foltiaapi.model.vo.SubtitleQueryInput
-import com.xxuz.piclane.foltiaapi.model.vo.SubtitleResult
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
@@ -73,12 +71,14 @@ class ProgramDao(
             conditions.add("P.firstlight <= :firstLightBefore")
             params["firstLightBefore"] = query.firstLightBefore.year * 100 + query.firstLightBefore.monthValue
         }
-        if(query?.keyword != null) {
-            conditions.add("title = :keyword")
-            conditions.add("shorttitle = :keyword")
-            conditions.add("titleyomi = :keyword")
-            conditions.add("titleen = :keyword")
-            params["keyword"] = "%${query.keyword}%"
+        if(query?.titleContains != null) {
+            conditions.add("""(
+                P.title LIKE :titleContains OR
+                P.shorttitle LIKE :titleContains OR
+                P.titleyomi LIKE :titleContains OR
+                P.titleen LIKE :titleContains
+            )""".trimIndent())
+            params["titleContains"] = "%${query.titleContains}%"
         }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"

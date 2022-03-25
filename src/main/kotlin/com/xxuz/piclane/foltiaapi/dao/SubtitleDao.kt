@@ -91,13 +91,9 @@ class SubtitleDao(
         } else if(query?.hasRecording == false) {
             conditions.add("(S.m2pfilename IS NULL AND S.pspfilename IS NULL AND S.mp4hd IS NULL)")
         }
-        if(query?.keyword != null) {
-            conditions.add("S.subtitle LIKE :keyword")
-            conditions.add("P.title LIKE :keyword")
-            conditions.add("P.shorttitle LIKE :keyword")
-            conditions.add("P.titleyomi LIKE :keyword")
-            conditions.add("P.titleen LIKE :keyword")
-            params["keyword"] = "%${query.keyword}%"
+        if(query?.subtitleContains != null) {
+            conditions.add("S.subtitle LIKE :subtitleContains")
+            params["subtitleContains"] = "%${query.subtitleContains}%"
         }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"

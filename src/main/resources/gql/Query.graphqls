@@ -45,8 +45,8 @@ input SubtitleQueryInput {
     """
     hasRecording: Boolean
 
-    "キーワード"
-    keyword: String
+    "サブタイトル (部分一致)"
+    subtitleContains: String
 }
 
 "番組クエリ入力"
@@ -57,8 +57,8 @@ input ProgramQueryInput {
     "番組開始時期の最大値"
     firstLightBefore: LocalDate
 
-    "キーワード"
-    keyword: String
+    "番組タイトル (部分一致)"
+    titleContains: String
 }
 
 "チャンネルクエリ入力"
