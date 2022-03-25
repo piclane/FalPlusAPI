@@ -23,11 +23,11 @@ class QueryResolver(
     @Autowired
     private val stationDao: StationDao,
 ) : GraphQLQueryResolver {
-    fun subtitles(query: SubtitleQueryInput?, page: Int) =
-        subtitleDao.find(query, page)
+    fun subtitles(query: SubtitleQueryInput?, page: Int, pageRows: Int) =
+        subtitleDao.find(query, page, pageRows)
 
-    fun programs(query: ProgramQueryInput?, page: Int) =
-        programDao.find(query, page)
+    fun programs(query: ProgramQueryInput?, page: Int, pageRows: Int) =
+        programDao.find(query, page, pageRows)
 
     fun stations(query: StationQueryInput?): StationResult =
         stationDao.find(query)

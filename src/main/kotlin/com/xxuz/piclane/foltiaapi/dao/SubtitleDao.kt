@@ -25,10 +25,6 @@ class SubtitleDao(
         @Autowired
         private val cacheMgr: CacheManager,
 ) {
-    companion object {
-        private const val defaultPageRows = 100
-    }
-
     /**
      * ID から放送を取得します
      */
@@ -60,7 +56,7 @@ class SubtitleDao(
      * @param page ページインデックス
      * @param pageRows ページあたりの行数
      */
-    fun find(query: SubtitleQueryInput?, page: Int, pageRows: Int = defaultPageRows): SubtitleResult {
+    fun find(query: SubtitleQueryInput?, page: Int, pageRows: Int): SubtitleResult {
         val conditions = mutableListOf<String>()
         val params = mutableMapOf<String, Any>(
             "limit" to pageRows,

@@ -4,16 +4,18 @@ type Query {
 
     @param query クエリ
     @param page ページインデックス
+    @param pageRows ページあたりの行数
     """
-    subtitles(query: SubtitleQueryInput, page: Int!): SubtitleResult!
+    subtitles(query: SubtitleQueryInput, page: Int!, pageRows: Int! = 100): SubtitleResult!
 
     """
     番組を取得します
 
     @param query クエリ
     @param page ページインデックス
+    @param pageRows ページあたりの行数
     """
-    programs(query: ProgramQueryInput, page: Int!): ProgramResult!
+    programs(query: ProgramQueryInput, page: Int!, pageRows: Int! = 100): ProgramResult!
 
     """
     チャンネルを取得します

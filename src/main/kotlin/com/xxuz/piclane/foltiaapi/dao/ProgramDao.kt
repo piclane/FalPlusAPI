@@ -21,10 +21,6 @@ class ProgramDao(
         @Autowired
         private val jt: NamedParameterJdbcTemplate
 ) {
-    companion object {
-        private const val defaultPageRows = 100
-    }
-
     /**
      * ID から放送を取得します
      */
@@ -56,7 +52,7 @@ class ProgramDao(
      * @param page ページインデックス
      * @param pageRows ページあたりの行数
      */
-    fun find(query: ProgramQueryInput?, page: Int, pageRows: Int = defaultPageRows): ProgramResult {
+    fun find(query: ProgramQueryInput?, page: Int, pageRows: Int): ProgramResult {
         val conditions = mutableListOf<String>()
         val params = mutableMapOf<String, Any>(
             "limit" to pageRows,
