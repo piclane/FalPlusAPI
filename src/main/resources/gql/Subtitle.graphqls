@@ -82,6 +82,12 @@ type Subtitle {
 
     "番組"
     program: Program!
+
+    "ドロップ情報概要"
+    dropInfoSummary: DropInfoSummary
+
+    "パケット識別子ごとのドロップ情報"
+    dropInfoDetail: [DropInfoDetail!]
 }
 
 "放送更新入力"
@@ -232,4 +238,31 @@ enum SyobocalFlag {
 
     "再放送"
     Rerun
+}
+
+"ドロップ情報概要"
+type DropInfoSummary {
+    "全パケット数"
+    totalSum: Int!
+
+    "全ドロップしたパケット数"
+    dropSum: Int!
+
+    "全スクランブルされているパケット数"
+    scramblingSum: Int!
+}
+
+"パケット識別子ごとのドロップ情報"
+type DropInfoDetail {
+    "パケット識別子"
+    pid: Int
+
+    "パケット数"
+    total: Int!
+
+    "ドロップしたパケット数"
+    drop: Int!
+
+    "スクランブルされているパケット数"
+    scrambling: Int!
 }

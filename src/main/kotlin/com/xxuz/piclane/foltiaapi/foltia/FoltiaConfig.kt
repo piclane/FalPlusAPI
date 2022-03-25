@@ -24,9 +24,11 @@ data class FoltiaConfig(
     /** バージョン */
     val firmwareVersion: String,
 ) {
+    /** perl ファイルを取得します */
     fun perlPath(pl: String): File =
         File(this.perlToolPath, "perl${File.pathSeparator}${pl}")
 
+    /** php ファイルを取得します */
     fun phpPath(php: String): File =
         File(this.phpToolPath, "php${File.pathSeparator}${php}")
 
@@ -71,4 +73,19 @@ data class FoltiaConfig(
             VideoType.SD -> sdVideoPath(subtitle)
             VideoType.HD -> hdVideoPath(subtitle)
         }
+
+    /**
+     * dropInfo ファイルへのパスを取得します
+     */
+    fun dropInfoPath(subtitle: Subtitle): File? =
+        if(subtitle.m2pFilename == null)
+            null
+        else {
+            val dropInfo = regexM2t.replace(subtitle.m2pFilename, "$1-dropinfo.txt")
+            programPath(subtitle.tId).resolve("m2p${File.separatorChar}${dropInfo}")
+        }
+
+    companion object {
+        private val regexM2t = Regex("""^(.+)\.m2t$""", RegexOption.IGNORE_CASE)
+    }
 }

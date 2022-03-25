@@ -2,6 +2,8 @@ package com.xxuz.piclane.foltiaapi.foltia
 
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
+import com.xxuz.piclane.foltiaapi.model.DropInfoDetail
+import com.xxuz.piclane.foltiaapi.model.DropInfoSummary
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.VideoType
 import com.xxuz.piclane.foltiaapi.model.vo.DeleteSubtitleVideoInput
@@ -138,11 +140,41 @@ class FoltiaManipulation(
         val txStatus = txMgr.getTransaction(tx)
 
         // DB から動画を削除
-        val (oldSubtitle, newSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
+        val (oldSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
 
         // 動画ファイルを削除
         if(config.tsVideoPath(oldSubtitle)?.delete() != true) {
             txMgr.rollback(txStatus)
         }
+    }
+
+    /**
+     * dropInfo を取得します
+     */
+    fun loadDropInfo(subtitle: Subtitle): DropInfoSummary? {
+        val dropInfoFile = config.dropInfoPath(subtitle) ?: return null
+        if(!dropInfoFile.exists()) {
+            return null
+        }
+
+        val details = mutableListOf<DropInfoDetail>()
+        dropInfoFile.bufferedReader().use { reader ->
+            for(line in reader.lineSequence()) {
+                val m = regexDropInfo.matchEntire(line)
+                if(m != null) {
+                    details.add(DropInfoDetail(
+                        pid = m.groupValues[1].toInt(16),
+                        total = m.groupValues[2].toLong(),
+                        drop = m.groupValues[3].toLong(),
+                        scrambling = m.groupValues[4].toLong(),
+                    ))
+                }
+            }
+        }
+        return DropInfoSummary(details)
+    }
+
+    companion object {
+        private val regexDropInfo = Regex("""^pid=\s*0x([0-9a-f]+),\s*total=\s*(\d+),\s*drop=\s*(\d+),\s*scrambling=\s*(\d+)$""", RegexOption.IGNORE_CASE)
     }
 }
