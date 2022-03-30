@@ -83,6 +83,9 @@ type Subtitle {
     "番組"
     program: Program!
 
+    "すべてのキーワードグループ"
+    keywordGroups: [KeywordGroup!]
+
     "ドロップ情報概要"
     dropInfoSummary: DropInfoSummary
 

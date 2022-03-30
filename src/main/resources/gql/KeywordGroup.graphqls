@@ -1,0 +1,8 @@
+"キーワードグループ"
+type KeywordGroup {
+    "キーワードグループ ID"
+    keywordGroupId: Int!
+
+    "キーワード"
+    keyword: String!
+}

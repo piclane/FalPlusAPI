@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.resolver
 
+import com.xxuz.piclane.foltiaapi.dao.KeywordGroupDao
 import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaConfig
@@ -20,6 +21,9 @@ class SubtitleResolver(
     private val programDao: ProgramDao,
 
     @Autowired
+    private val keywordGroupDao: KeywordGroupDao,
+
+    @Autowired
     private val foltiaConfig: FoltiaConfig,
 
     @Autowired
@@ -30,6 +34,12 @@ class SubtitleResolver(
 
     fun program(subtitle: Subtitle): Program =
         programDao.get(subtitle.tId) ?: throw IllegalArgumentException("tId ${subtitle.tId} is invalid.")
+
+    fun keywordGroups(subtitle: Subtitle): List<KeywordGroup>? =
+        if(subtitle.tId == Program.KEYWORD_TID)
+            keywordGroupDao.find(subtitle.countNo ?: throw IllegalArgumentException("subtitle.countNo is null"))
+        else
+            null
 
     fun dropInfoSummary(subtitle: Subtitle): DropInfoSummary? =
         foltiaManipulation.loadDropInfo(subtitle)
