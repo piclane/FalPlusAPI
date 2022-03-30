@@ -2,11 +2,13 @@ package com.xxuz.piclane.foltiaapi.resolver
 
 import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
+import com.xxuz.piclane.foltiaapi.foltia.FoltiaConfig
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
 import com.xxuz.piclane.foltiaapi.model.*
 import graphql.kickstart.tools.GraphQLResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 @Suppress("unused")
@@ -16,6 +18,9 @@ class SubtitleResolver(
 
     @Autowired
     private val programDao: ProgramDao,
+
+    @Autowired
+    private val foltiaConfig: FoltiaConfig,
 
     @Autowired
     private val foltiaManipulation: FoltiaManipulation
@@ -31,4 +36,7 @@ class SubtitleResolver(
 
     fun dropInfoDetail(subtitle: Subtitle): List<DropInfoDetail>? =
         foltiaManipulation.loadDropInfo(subtitle)?.details
+
+    fun thumbnailUri(subtitle: Subtitle): URI? =
+        foltiaConfig.thumbnailUri(subtitle)
 }

@@ -88,6 +88,9 @@ type Subtitle {
 
     "パケット識別子ごとのドロップ情報"
     dropInfoDetail: [DropInfoDetail!]
+
+    "サムネイルの URI"
+    thumbnailUri: URI
 }
 
 "放送更新入力"

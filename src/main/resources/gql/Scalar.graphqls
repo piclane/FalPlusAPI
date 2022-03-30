@@ -31,3 +31,8 @@ scalar Duration
 ファイルアップロード型
 """
 scalar Upload
+
+"""
+URI 型
+"""
+scalar URI

@@ -24,8 +24,17 @@ class FoltiaConfiguration(
             perlToolPath = result["perltoolpath"]?.let { File(it) } ?: throw IllegalStateException("The perltoolpath configuration is missing."),
             phpToolPath = result["phptoolpath"]?.let { File(it) } ?: throw IllegalStateException("The phptoolpath configuration is missing."),
             recFolderPath = result["recfolderpath"]?.let { File(it) } ?: throw IllegalStateException("The recfolderpath configuration is missing."),
-            httpMediaMapPath = result["httpmediamappath"]?.let { URI(it) } ?: throw IllegalStateException("The httpmediamappath configuration is missing."),
+            httpMediaMapPath = result["httpmediamappath"]?.let { URI(slashEnd(it)) } ?: throw IllegalStateException("The httpmediamappath configuration is missing."),
             firmwareVersion = result["firmwareversion"] ?: "",
         )
     }
+
+    /**
+     * 指定された文字列の末尾を / で終わらせます
+     */
+    private fun slashEnd(str: String): String =
+        if(str.endsWith("/"))
+            str
+        else
+            "$str/"
 }

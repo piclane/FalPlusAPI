@@ -44,4 +44,7 @@ class MainApplication {
 
     @Bean
     fun getUploadScalar(): GraphQLScalarType = ApolloScalars.Upload
+
+    @Bean
+    fun getUriScalar() = UriScalar
 }

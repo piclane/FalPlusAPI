@@ -75,6 +75,23 @@ data class FoltiaConfig(
         }
 
     /**
+     * サムネイルへのパスを取得します
+     */
+    fun thumbnailPath(subtitle: Subtitle): File? =
+        if(subtitle.m2pFilename == null)
+            null
+        else {
+            val thm = regexM2t.replace(subtitle.m2pFilename, "$1.THM")
+            programPath(subtitle.tId).resolve("mp4${File.separatorChar}MAQ-${thm}")
+        }
+
+    /**
+     * サムネイルの URI を取得します
+     */
+    fun thumbnailUri(subtitle: Subtitle): URI? =
+        fileToUri(thumbnailPath(subtitle))
+
+    /**
      * dropInfo ファイルへのパスを取得します
      */
     fun dropInfoPath(subtitle: Subtitle): File? =
@@ -84,6 +101,20 @@ data class FoltiaConfig(
             val dropInfo = regexM2t.replace(subtitle.m2pFilename, "$1-dropinfo.txt")
             programPath(subtitle.tId).resolve("m2p${File.separatorChar}${dropInfo}")
         }
+
+    /**
+     * ファイルのパスから URI に変換します
+     */
+    private fun fileToUri(file: File?): URI? {
+        if(file == null) {
+            return null
+        }
+
+        if(file.startsWith(recFolderPath)) {
+            return httpMediaMapPath.resolve(file.relativeTo(recFolderPath).toString())
+        }
+        return null
+    }
 
     companion object {
         private val regexM2t = Regex("""^(.+)\.m2t$""", RegexOption.IGNORE_CASE)
