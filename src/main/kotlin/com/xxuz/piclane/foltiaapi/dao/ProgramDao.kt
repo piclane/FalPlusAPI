@@ -123,9 +123,9 @@ class ProgramDao(
                         LocalDate.parse(it.toString(10) + "01", firstLightDateFormatter)
                 },
                 aspect = rs.getLong("aspect"),
-                shorttitle = rs.getString("shorttitle") ?: "",
-                titleyomi = rs.getString("titleyomi") ?: "",
-                titleen = rs.getString("titleen") ?: "",
+                shortTitle = rs.getString("shorttitle") ?: "",
+                titleYomi = rs.getString("titleyomi") ?: "",
+                titleEn = rs.getString("titleen") ?: "",
             )
     }
 }

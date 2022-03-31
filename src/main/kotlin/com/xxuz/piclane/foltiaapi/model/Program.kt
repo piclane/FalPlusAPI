@@ -40,13 +40,13 @@ data class Program(
 //        val pspdirname: String?,
 
     /** タイトル (短縮) */
-    val shorttitle: String,
+    val shortTitle: String,
 
     /** タイトル (読み) */
-    val titleyomi: String,
+    val titleYomi: String,
 
     /** タイトル (英語) */
-    val titleen: String,
+    val titleEn: String,
 ) {
     companion object {
         /** キーワード録画の TID */

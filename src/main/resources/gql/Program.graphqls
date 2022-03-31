@@ -26,11 +26,11 @@ type Program {
     aspect: Int
 
     "タイトル (短縮)"
-    shorttitle: String!
+    shortTitle: String!
 
     "タイトル (読み)"
-    titleyomi: String!
+    titleYomi: String!
 
     "タイトル (英語)"
-    titleen: String!
+    titleEn: String!
 }
