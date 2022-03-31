@@ -220,6 +220,9 @@ enum FileStatus {
 
     "全完了"
     ALL_COMPLETE
+
+    "変換不能"
+    TRANSCODE_FAILED
 }
 
 "トランスコード品質"

@@ -137,7 +137,7 @@ data class Subtitle(
         /** 静止画キャプ終了 */
         CAPEND(70),
 
-        /** サムネイル作成済み(.THM) */
+        /** サムネイル作成中(.THM) */
         THM_CREATE(72),
 
         /** トラコン待 */
@@ -168,7 +168,10 @@ data class Subtitle(
         WAITING_HD_TRANSCODE(160),
 
         /** 全完了 */
-        ALL_COMPLETE(200);
+        ALL_COMPLETE(200),
+
+        /** 変換不能 */
+        TRANSCODE_FAILED(999);
 
         companion object {
             /**
