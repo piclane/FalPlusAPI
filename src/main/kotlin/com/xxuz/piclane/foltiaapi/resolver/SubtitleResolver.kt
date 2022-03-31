@@ -41,6 +41,15 @@ class SubtitleResolver(
         else
             null
 
+    fun tsVideoUri(subtitle: Subtitle): URI? =
+        foltiaConfig.tsVideoUri(subtitle)
+
+    fun sdVideoUri(subtitle: Subtitle): URI? =
+        foltiaConfig.sdVideoUri(subtitle)
+
+    fun hdVideoUri(subtitle: Subtitle): URI? =
+        foltiaConfig.hdVideoUri(subtitle)
+
     fun dropInfoSummary(subtitle: Subtitle): DropInfoSummary? =
         foltiaManipulation.loadDropInfo(subtitle)
 

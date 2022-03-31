@@ -86,6 +86,15 @@ type Subtitle {
     "すべてのキーワードグループ"
     keywordGroups: [KeywordGroup!]
 
+    "TS 動画ファイルへの URI"
+    tsVideoUri: URI
+
+    "SD 動画ファイルへの URI"
+    sdVideoUri: URI
+
+    "HD 動画ファイルへの URI"
+    hdVideoUri: URI
+
     "ドロップ情報概要"
     dropInfoSummary: DropInfoSummary
 

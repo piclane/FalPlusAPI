@@ -47,6 +47,12 @@ data class FoltiaConfig(
             recFolderPath.resolve(subtitle.m2pFilename)
 
     /**
+     * TS 動画の URI を取得します
+     */
+    fun tsVideoUri(subtitle: Subtitle): URI? =
+        fileToUri(tsVideoPath(subtitle))
+
+    /**
      * SD 動画へのパスを取得します
      */
     fun sdVideoPath(subtitle: Subtitle): File? =
@@ -56,6 +62,12 @@ data class FoltiaConfig(
             programPath(subtitle.tId).resolve("mp4${File.separatorChar}${subtitle.pspFilename}")
 
     /**
+     * SD 動画の URI を取得します
+     */
+    fun sdVideoUri(subtitle: Subtitle): URI? =
+        fileToUri(sdVideoPath(subtitle))
+
+    /**
      * HD 動画へのパスを取得します
      */
     fun hdVideoPath(subtitle: Subtitle): File? =
@@ -63,6 +75,12 @@ data class FoltiaConfig(
             null
         else
             programPath(subtitle.tId).resolve("mp4${File.separatorChar}${subtitle.mp4hd}")
+
+    /**
+     * HD 動画の URI を取得します
+     */
+    fun hdVideoUri(subtitle: Subtitle): URI? =
+        fileToUri(hdVideoPath(subtitle))
 
     /**
      * 動画へのパスを取得します
