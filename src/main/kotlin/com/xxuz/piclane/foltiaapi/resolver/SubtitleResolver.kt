@@ -36,7 +36,7 @@ class SubtitleResolver(
         programDao.get(subtitle.tId) ?: throw IllegalArgumentException("tId ${subtitle.tId} is invalid.")
 
     fun keywordGroups(subtitle: Subtitle): List<KeywordGroup>? =
-        if(subtitle.tId == Program.KEYWORD_TID)
+        if(subtitle.tId == Program.TID_KEYWORD)
             keywordGroupDao.find(subtitle.countNo ?: throw IllegalArgumentException("subtitle.countNo is null"))
         else
             null

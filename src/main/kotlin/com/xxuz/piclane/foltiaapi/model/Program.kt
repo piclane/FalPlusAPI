@@ -50,9 +50,9 @@ data class Program(
 ) {
     companion object {
         /** キーワード録画の TID */
-        const val KEYWORD_TID = -1L
+        const val TID_KEYWORD = -1L
 
         /** EPG 録画の TID */
-        const val EPG_TID = 0L
+        const val TID_EPG = 0L
     }
 }

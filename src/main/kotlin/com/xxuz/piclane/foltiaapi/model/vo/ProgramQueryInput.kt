@@ -14,4 +14,11 @@ data class ProgramQueryInput(
 
     /** 番組タイトル (部分一致) */
     val titleContains: String?,
+
+    /**
+     * 録画が存在する番組を取得する場合 true
+     * 録画が存在しない番組を取得する場合 false
+     * すべての放送を取得する場合 null
+     */
+    val hasRecording: Boolean?,
 )

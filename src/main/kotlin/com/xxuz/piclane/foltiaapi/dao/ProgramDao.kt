@@ -53,8 +53,12 @@ class ProgramDao(
      * @param pageRows ページあたりの行数
      */
     fun find(query: ProgramQueryInput?, page: Int, pageRows: Int): ProgramResult {
-        val conditions = mutableListOf<String>()
+        val conditions = mutableListOf<String>(
+            "tid NOT IN (:tIdKeyword, :tIdEpg)"
+        )
         val params = mutableMapOf<String, Any>(
+            "tIdKeyword" to Program.TID_KEYWORD,
+            "tIdEpg" to Program.TID_EPG,
             "limit" to pageRows,
             "offset" to pageRows * page
         )
@@ -76,6 +80,27 @@ class ProgramDao(
             )""".trimIndent())
             params["titleContains"] = "%${query.titleContains}%"
         }
+        if(query?.hasRecording == true) {
+            conditions.add("""EXISTS(
+                SELECT 1
+                FROM foltia_subtitle AS S 
+                WHERE S.tid = P.tid AND (
+                    (S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename)) OR 
+                    (S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename)) OR 
+                    (S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))
+                )
+            )""".trimIndent())
+        } else if(query?.hasRecording == false) {
+            conditions.add("""EXISTS(
+                SELECT 1
+                FROM foltia_subtitle AS S 
+                WHERE S.tid = P.tid AND (
+                    S.m2pfilename IS NULL AND
+                    S.pspfilename IS NULL AND
+                    S.mp4hd IS NULL
+                )
+            )""".trimIndent())
+        }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
         val data =  jt.query(
@@ -85,7 +110,7 @@ class ProgramDao(
             FROM
                 foltia_program AS P
             $where
-            ORDER BY firstlight DESC
+            ORDER BY firstlight DESC, tid DESC 
             LIMIT :limit
             OFFSET :offset
             """,
