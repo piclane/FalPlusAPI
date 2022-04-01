@@ -23,6 +23,13 @@ type Query {
     @param query クエリ
     """
     stations(query: StationQueryInput): StationResult!
+
+    """
+    キーワードグループを取得します
+
+    @param query クエリ
+    """
+    keywordGroups(query: KeywordGroupQueryInput): [KeywordGroup!]!
 }
 
 "放送クエリ入力"
@@ -65,7 +72,7 @@ input ProgramQueryInput {
     """
     録画が存在する番組を取得する場合 true
     録画が存在しない番組を取得する場合 false
-    両方の放送を取得する場合 null
+    両方の番組を取得する場合 null
     """
     hasRecording: Boolean
 }
@@ -78,4 +85,17 @@ input StationQueryInput {
     すべてのチャンネルを取得する場合 null
     """
     receivableStation: Boolean = true
+}
+
+"キーワードグループクエリ入力"
+input KeywordGroupQueryInput {
+    """
+    録画が存在するキーワードグループを取得する場合 true
+    録画が存在しないキーワードグループを取得する場合 false
+    両方のキーワードグループを取得する場合 null
+    """
+    hasRecording: Boolean
+
+    "キーワード (部分一致)"
+    keywordContains: String
 }
