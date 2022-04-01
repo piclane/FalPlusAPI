@@ -54,6 +54,9 @@ input SubtitleQueryInput {
     """
     hasRecording: Boolean
 
+    "キーワードグループID"
+    keywordGroupId: Int
+
     "サブタイトル (部分一致)"
     subtitleContains: String
 }

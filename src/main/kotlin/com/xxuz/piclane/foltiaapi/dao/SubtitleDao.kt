@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.dao
 
+import com.xxuz.piclane.foltiaapi.model.Program
 import com.xxuz.piclane.foltiaapi.model.vo.SubtitleQueryInput
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.VideoType
@@ -60,7 +61,8 @@ class SubtitleDao(
         val conditions = mutableListOf<String>()
         val params = mutableMapOf<String, Any>(
             "limit" to pageRows,
-            "offset" to pageRows * page
+            "offset" to pageRows * page,
+            "tIdKeyword" to Program.TID_KEYWORD,
         )
 
         if(query?.tId != null) {
@@ -86,6 +88,18 @@ class SubtitleDao(
             )""".trimIndent())
         } else if(query?.hasRecording == false) {
             conditions.add("(S.m2pfilename IS NULL AND S.pspfilename IS NULL AND S.mp4hd IS NULL)")
+        }
+        if(query?.keywordGroupId != null) {
+            conditions.add("""
+                S.tid = :tIdKeyword AND 
+                EXISTS(
+                    SELECT 1 
+                    FROM foltia_keywordlibfiles AS F 
+                    WHERE F.keywordgroupid = :keywordGroupId AND
+                          F.countno = S.countno
+                )
+            """.trimIndent())
+            params["keywordGroupId"] = query.keywordGroupId
         }
         if(query?.subtitleContains != null) {
             conditions.add("S.subtitle LIKE :subtitleContains")

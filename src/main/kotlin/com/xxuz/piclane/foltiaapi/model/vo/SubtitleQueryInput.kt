@@ -26,6 +26,9 @@ data class SubtitleQueryInput(
      */
     val hasRecording: Boolean?,
 
+    /** キーワードグループID */
+    val keywordGroupId: Long?,
+
     /** サブタイトル (部分一致) */
     val subtitleContains: String?,
 )
