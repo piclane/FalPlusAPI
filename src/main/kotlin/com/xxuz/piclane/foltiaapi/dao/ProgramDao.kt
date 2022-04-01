@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * 番組Dao
@@ -136,7 +139,6 @@ class ProgramDao(
      * ResultSet から Program にマッピングする RowMapper
      */
     private object RowMapperImpl : RowMapper<Program> {
-        private val firstLightDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
         override fun mapRow(rs: ResultSet, rowNum: Int): Program =
             Program(
                 tId = rs.getLong("tid"),
@@ -144,8 +146,11 @@ class ProgramDao(
                 firstLight = rs.getInt("firstlight").let {
                     if (rs.wasNull())
                         null
-                    else
-                        LocalDate.parse(it.toString(10) + "01", firstLightDateFormatter)
+                    else {
+                        val year = floor(it / 100.0).toInt()
+                        val month = min(12, max(1, it % 100))
+                        LocalDate.of(year, month, 1)
+                    }
                 },
                 aspect = rs.getLong("aspect"),
                 shortTitle = rs.getString("shorttitle") ?: "",
