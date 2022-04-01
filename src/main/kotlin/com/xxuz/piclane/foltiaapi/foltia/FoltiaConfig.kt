@@ -94,20 +94,29 @@ data class FoltiaConfig(
 
     /**
      * サムネイルへのパスを取得します
+     *
+     * @param nullIfAbsent
+     *      サムネイルのファイルが存在しない場合は null を返す場合は true
+     *      サムネイルのファイルの存在に関わらずパスを取得する場合は false
      */
-    fun thumbnailPath(subtitle: Subtitle): File? =
+    fun thumbnailPath(subtitle: Subtitle, nullIfAbsent: Boolean = true): File? =
         if(subtitle.m2pFilename == null)
             null
         else {
             val thm = regexM2t.replace(subtitle.m2pFilename, "$1.THM")
-            programPath(subtitle.tId).resolve("mp4${File.separatorChar}MAQ-${thm}")
+            val file = programPath(subtitle.tId).resolve("mp4${File.separatorChar}MAQ-${thm}")
+            if(!nullIfAbsent || file.exists()) file else null
         }
 
     /**
      * サムネイルの URI を取得します
+     *
+     * @param nullIfAbsent
+     *      サムネイルのファイルが存在しない場合は null を返す場合は true
+     *      サムネイルのファイルの存在に関わらずパスを取得する場合は false
      */
-    fun thumbnailUri(subtitle: Subtitle): URI? =
-        fileToUri(thumbnailPath(subtitle))
+    fun thumbnailUri(subtitle: Subtitle, nullIfAbsent: Boolean = true): URI? =
+        fileToUri(thumbnailPath(subtitle, nullIfAbsent))
 
     /**
      * dropInfo ファイルへのパスを取得します
