@@ -2,6 +2,13 @@ type Query {
     """
     放送を取得します
 
+    @param pId 放送 ID
+    """
+    subtitle(pId: Int!): Subtitle
+
+    """
+    放送を取得します
+
     @param query クエリ
     @param page ページインデックス
     @param pageRows ページあたりの行数

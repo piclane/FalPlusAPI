@@ -5,6 +5,7 @@ import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.model.KeywordGroup
+import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLQueryResolver
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +26,9 @@ class QueryResolver(
     @Autowired
     private val keywordGroupDao: KeywordGroupDao,
 ) : GraphQLQueryResolver {
+    fun subtitle(pId: Long): Subtitle =
+        subtitleDao.get(pId) ?: throw IllegalArgumentException("pId $pId is not exists.")
+
     fun subtitles(query: SubtitleQueryInput?, page: Int, pageRows: Int) =
         subtitleDao.find(query, page, pageRows)
 
