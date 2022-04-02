@@ -103,6 +103,9 @@ type Subtitle {
 
     "サムネイルの URI"
     thumbnailUri: URI
+
+    "動画全体のサムネイルの URI"
+    thumbnailUris: [URI!]
 }
 
 "放送更新入力"

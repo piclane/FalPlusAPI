@@ -3,6 +3,7 @@ package com.xxuz.piclane.foltiaapi.foltia
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.VideoType
 import java.io.File
+import java.io.FilenameFilter
 import java.net.URI
 
 /**
@@ -117,6 +118,28 @@ data class FoltiaConfig(
      */
     fun thumbnailUri(subtitle: Subtitle, nullIfAbsent: Boolean = true): URI? =
         fileToUri(thumbnailPath(subtitle, nullIfAbsent))
+
+    /**
+     * 動画全体のサムネイルへのパスを取得します
+     */
+    fun thumbnailPaths(subtitle: Subtitle): List<File>? =
+        if(subtitle.m2pFilename == null)
+            null
+        else {
+            val dirName = regexM2t.replace(subtitle.m2pFilename, "$1")
+            val dir = programPath(subtitle.tId).resolve("img${File.separatorChar}${dirName}")
+            if(dir.isDirectory) {
+                dir.listFiles { _, filename ->  filename.endsWith(".jpg") }?.asList()
+            } else {
+                null
+            }
+        }
+
+    /**
+     * 動画全体のサムネイルへの URI を取得します
+     */
+    fun thumbnailUris(subtitle: Subtitle): List<URI>? =
+        thumbnailPaths(subtitle)?.mapNotNull { fileToUri(it) }
 
     /**
      * dropInfo ファイルへのパスを取得します

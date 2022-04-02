@@ -58,4 +58,7 @@ class SubtitleResolver(
 
     fun thumbnailUri(subtitle: Subtitle): URI? =
         foltiaConfig.thumbnailUri(subtitle)
+
+    fun thumbnailUris(subtitle: Subtitle): List<URI>? =
+        foltiaConfig.thumbnailUris(subtitle)
 }
