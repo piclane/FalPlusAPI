@@ -242,19 +242,6 @@ class SubtitleDao(
     fun deleteVideo(pId: Long, videoTypes: Set<VideoType>): Pair<Subtitle, Subtitle>? {
         val subtitle = get(pId) ?: return null
 
-        // foltia_subtitle の列を更新
-        val subtitleSet = videoTypes.map {
-            "${videoColumn(it)} = null"
-        }
-        jt.update(
-            """
-            UPDATE foltia_subtitle SET ${subtitleSet.joinToString(", ")} WHERE pid = :pId
-            """,
-            mapOf(
-                "pId" to pId
-            )
-        )
-
         // 各種動画ファイルテーブルの行を削除
         videoTypes.forEach { videoType ->
             val filename = subtitle.videoFilename(videoType) ?: return@forEach
