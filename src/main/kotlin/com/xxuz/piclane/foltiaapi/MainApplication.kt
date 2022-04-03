@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi
 
+import com.xxuz.piclane.foltiaapi.model.CmEdit
 import com.xxuz.piclane.foltiaapi.scalar.*
 import graphql.kickstart.servlet.apollo.ApolloScalars
 import graphql.kickstart.tools.SchemaParserDictionary
@@ -25,6 +26,8 @@ class MainApplication {
     fun getSchemaParser(): SchemaParserDictionary =
         SchemaParserDictionary().apply {
 //            add(ApplicationComponentModel::class)
+            add("CmEditDetectThreshold", CmEdit.DetectThreshold::class.java)
+            add("CmEditRule", CmEdit.Rule::class.java)
         }
 
     @Bean

@@ -78,18 +78,3 @@ enum DigitalStationBand {
     "未定義"
     UNDEFINED
 }
-
-"CM 検出閾値"
-enum CmEditDetectThreshold {
-    "オフ (無効)"
-    OFF
-
-    "弱 (CM判定が緩くなり本編・CMがより多く残りやすい)"
-    LOW
-
-    "中"
-    MEDIUM
-
-    "強 (CM判定が厳しくなり本編・CMがより多くカットされやすい)"
-    HIGH
-}

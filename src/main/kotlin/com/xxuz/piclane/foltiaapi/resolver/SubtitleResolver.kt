@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.resolver
 
+import com.xxuz.piclane.foltiaapi.dao.CmEditDao
 import com.xxuz.piclane.foltiaapi.dao.KeywordGroupDao
 import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
@@ -22,6 +23,9 @@ class SubtitleResolver(
 
     @Autowired
     private val keywordGroupDao: KeywordGroupDao,
+
+    @Autowired
+    private val cmEditDao: CmEditDao,
 
     @Autowired
     private val foltiaConfig: FoltiaConfig,
@@ -61,4 +65,7 @@ class SubtitleResolver(
 
     fun thumbnailUris(subtitle: Subtitle): List<URI>? =
         foltiaConfig.thumbnailUris(subtitle)
+
+    fun cmEdit(subtitle: Subtitle): CmEdit =
+        cmEditDao.get(subtitle.pId)
 }

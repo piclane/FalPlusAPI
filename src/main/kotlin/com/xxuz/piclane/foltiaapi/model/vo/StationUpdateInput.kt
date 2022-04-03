@@ -2,6 +2,7 @@ package com.xxuz.piclane.foltiaapi.model.vo
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
+import com.xxuz.piclane.foltiaapi.model.CmEdit
 import com.xxuz.piclane.foltiaapi.model.Station
 
 /**
@@ -30,7 +31,7 @@ data class StationUpdateInput(
     val receivingDefined: Boolean,
 
     /** CM 検出閾値 */
-    val cmEditDetectThreshold: Station.CmEditDetectThreshold?,
+    val cmEditDetectThreshold: CmEdit.DetectThreshold?,
     val cmEditDetectThresholdDefined: Boolean,
 ) {
     @JsonPOJOBuilder(withPrefix = "set")
@@ -71,7 +72,7 @@ data class StationUpdateInput(
         var receivingDefined: Boolean = false
 
         /** CM 検出閾値 */
-        var cmEditDetectThreshold: Station.CmEditDetectThreshold? = null
+        var cmEditDetectThreshold: CmEdit.DetectThreshold? = null
             set(value) {
                 field = value
                 cmEditDetectThresholdDefined = true

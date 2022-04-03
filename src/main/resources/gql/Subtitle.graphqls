@@ -106,6 +106,9 @@ type Subtitle {
 
     "動画全体のサムネイルの URI"
     thumbnailUris: [URI!]
+
+    "CM カット情報"
+    cmEdit: CmEdit!
 }
 
 "放送更新入力"

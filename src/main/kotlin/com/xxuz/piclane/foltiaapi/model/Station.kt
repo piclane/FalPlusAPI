@@ -46,7 +46,7 @@ data class Station(
         val receiving: Boolean,
 
         /** CM 検出閾値 */
-        val cmEditDetectThreshold: CmEditDetectThreshold?,
+        val cmEditDetectThreshold: CmEdit.DetectThreshold,
 ) {
     /** 種別 */
     enum class DigitalStationBand(
@@ -73,32 +73,6 @@ data class Station(
              * コードから DigitalStationBand を取得します
              */
             fun codeOf(code: Int): Optional<DigitalStationBand> =
-                    Optional.ofNullable(values().find { it.code == code })
-        }
-    }
-
-    /** CM 検出閾値 */
-    enum class CmEditDetectThreshold(
-            /** コード */
-            val code: Int
-    ) {
-        /** オフ (無効) */
-        OFF(0),
-
-        /** 弱 (CM判定が緩くなり本編・CMがより多く残りやすい) */
-        LOW(1),
-
-        /** 中 */
-        MEDIUM(2),
-
-        /** 強 (CM判定が厳しくなり本編・CMがより多くカットされやすい)*/
-        HIGH(3);
-
-        companion object {
-            /**
-             * コードから CmEditDetectThreshold を取得します
-             */
-            fun codeOf(code: Int): Optional<CmEditDetectThreshold> =
                     Optional.ofNullable(values().find { it.code == code })
         }
     }

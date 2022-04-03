@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.dao
 
+import com.xxuz.piclane.foltiaapi.model.CmEdit
 import com.xxuz.piclane.foltiaapi.model.Station
 import com.xxuz.piclane.foltiaapi.model.vo.StationQueryInput
 import com.xxuz.piclane.foltiaapi.model.vo.StationResult
@@ -163,9 +164,9 @@ class StationDao(
                         receiving = rs.getLong("receiving") == 1L,
                         cmEditDetectThreshold = rs.getInt("cmeditdetectthreshold").let {
                             if (rs.wasNull())
-                                null
+                                CmEdit.DetectThreshold.OFF
                             else
-                                Station.CmEditDetectThreshold.codeOf(it).orElseThrow()
+                                CmEdit.DetectThreshold.codeOf(it)
                         },
                 )
     }
