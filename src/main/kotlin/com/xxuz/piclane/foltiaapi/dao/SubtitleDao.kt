@@ -63,18 +63,23 @@ class SubtitleDao(
             "limit" to pageRows,
             "offset" to pageRows * page,
             "tIdKeyword" to Program.TID_KEYWORD,
+            "tIdEpg" to Program.TID_EPG,
         )
 
         if(query?.tId != null) {
             conditions.add("S.tid = :tId")
             params["tId"] = query.tId
         }
-        if(query?.recordingType != null) {
-            when(query.recordingType) {
-                Subtitle.RecordingType.Program -> conditions.add("S.tid > 0")
-                Subtitle.RecordingType.Epg -> conditions.add("S.tid = 0")
-                Subtitle.RecordingType.Keyword -> conditions.add("S.tid = -1")
-            }
+        if(query?.recordingTypes != null) {
+            query.recordingTypes
+                .joinToString(" OR ") {
+                    when (it) {
+                        Subtitle.RecordingType.Program -> "S.tid > :tIdEpg"
+                        Subtitle.RecordingType.Epg -> "S.tid = :tIdEpg"
+                        Subtitle.RecordingType.Keyword -> "S.tid = :tIdKeyword"
+                    }
+                }
+                .also { conditions.add(it) }
         }
         if(query?.receivableStation != null) {
             conditions.add("ST.receiving = :receivableStation")

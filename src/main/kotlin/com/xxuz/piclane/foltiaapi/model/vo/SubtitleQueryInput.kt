@@ -10,7 +10,7 @@ data class SubtitleQueryInput(
     val tId: Int?,
 
     /** 録画タイプ */
-    val recordingType: Subtitle.RecordingType?,
+    val recordingTypes: Set<Subtitle.RecordingType>?,
 
     /**
      * 受信可能なチャンネルの放送のみを取得する場合 true

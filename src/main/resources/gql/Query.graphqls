@@ -45,7 +45,7 @@ input SubtitleQueryInput {
     tId: Int
 
     "録画タイプ"
-    recordingType: RecordingType
+    recordingTypes: [RecordingType!]
 
     """
     受信可能なチャンネルの放送のみを取得する場合 true
