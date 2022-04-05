@@ -35,11 +35,14 @@ class SubtitleDao(
             jt.queryForObject(
                 """
                 SELECT
-                    *
+                    S.*,
+                    N.recfilename
                 FROM
-                    foltia_subtitle
+                    foltia_subtitle AS S
+                LEFT OUTER JOIN 
+                    foltia_nowrecording AS N ON S.pid = N.pid
                 WHERE
-                    pid = :pId
+                    S.pid = :pId
                 """,
                 mutableMapOf(
                     "pId" to pId
@@ -87,6 +90,7 @@ class SubtitleDao(
         }
         if(query?.hasRecording == true) {
             conditions.add("""(
+                ${if(query.nowRecording == true) "N.recfilename IS NOT NULL OR" else ""}
                 (S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename)) OR 
                 (S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename)) OR 
                 (S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))
@@ -115,13 +119,16 @@ class SubtitleDao(
         val data =  jt.query(
             """
             SELECT
-                *
+                S.*,
+                N.recfilename
             FROM
                 foltia_subtitle AS S
             INNER JOIN
                 foltia_program AS P ON S.tid = P.tid
             INNER JOIN
                 foltia_station AS ST ON S.stationid = ST.stationid
+            LEFT OUTER JOIN 
+                foltia_nowrecording AS N ON S.pid = N.pid
             $where
             ORDER BY startdatetime DESC
             LIMIT :limit
@@ -140,6 +147,8 @@ class SubtitleDao(
                 foltia_program AS P ON S.tid = P.tid
             INNER JOIN
                 foltia_station AS ST ON S.stationid = ST.stationid
+            LEFT OUTER JOIN 
+                foltia_nowrecording AS N ON S.pid = N.pid
             $where
             """,
             params,
@@ -291,8 +300,10 @@ class SubtitleDao(
      * ResultSet から Subtitle にマッピングする RowMapper
      */
     private object RowMapperImpl : RowMapper<Subtitle> {
-        override fun mapRow(rs: ResultSet, rowNum: Int): Subtitle =
-            Subtitle(
+        override fun mapRow(rs: ResultSet, rowNum: Int): Subtitle {
+            val recFilename = rs.getString("recfilename")
+            val isRecording = recFilename?.isNotBlank() ?: false
+            return Subtitle(
                 pId = rs.getLong("pid"),
                 tId = rs.getLong("tid"),
                 stationId = rs.getLong("stationid"),
@@ -302,12 +313,14 @@ class SubtitleDao(
                 endDateTime = rs.getLong("enddatetime").toLocalDateTime(),
                 startOffset = rs.getLong("startoffset"),
                 lengthMin = rs.getLong("lengthmin"),
-                m2pFilename = rs.getString("m2pfilename"),
+                m2pFilename = if(isRecording) recFilename else rs.getString("m2pfilename"),
                 pspFilename = rs.getString("pspfilename"),
                 epgAddedBy = rs.getLong("epgaddedby").let { if (rs.wasNull()) null else it },
                 lastUpdate = rs.getTimestamp("lastupdate").toOffsetDateTime().orElse(null),
                 fileStatus = rs.getInt("filestatus").let {
-                    if (rs.wasNull())
+                    if (isRecording)
+                        Subtitle.FileStatus.RECORDING
+                    else if (rs.wasNull())
                         null
                     else
                         Subtitle.FileStatus.codeOf(it).orElseThrow()
@@ -328,5 +341,6 @@ class SubtitleDao(
                 },
                 syobocalRev = rs.getInt("syobocalrev"),
             )
+        }
     }
 }

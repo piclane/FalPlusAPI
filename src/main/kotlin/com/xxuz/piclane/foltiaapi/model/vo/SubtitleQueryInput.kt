@@ -26,6 +26,12 @@ data class SubtitleQueryInput(
      */
     val hasRecording: Boolean?,
 
+    /**
+     * hasRecording=true の場合に、録画中の放送を「録画が存在する」とみなす場合 true
+     * そうでない場合 false もしくは null
+     */
+    val nowRecording: Boolean?,
+
     /** キーワードグループID */
     val keywordGroupId: Long?,
 
