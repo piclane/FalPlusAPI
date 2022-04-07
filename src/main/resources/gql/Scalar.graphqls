@@ -36,3 +36,8 @@ scalar Upload
 URI 型
 """
 scalar URI
+
+"""
+Long 型
+"""
+scalar Long

@@ -37,6 +37,11 @@ type Query {
     @param query クエリ
     """
     keywordGroups(query: KeywordGroupQueryInput): [KeywordGroup!]!
+
+    """
+    ディスク情報を取得します
+    """
+    diskInfo: DiskInfo!
 }
 
 "放送クエリ入力"

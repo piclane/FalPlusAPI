@@ -4,12 +4,15 @@ import com.xxuz.piclane.foltiaapi.dao.KeywordGroupDao
 import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
+import com.xxuz.piclane.foltiaapi.foltia.FoltiaConfig
+import com.xxuz.piclane.foltiaapi.model.DiskInfo
 import com.xxuz.piclane.foltiaapi.model.KeywordGroup
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLQueryResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.nio.file.Files
 
 @Component
 @Suppress("unused")
@@ -25,6 +28,9 @@ class QueryResolver(
 
     @Autowired
     private val keywordGroupDao: KeywordGroupDao,
+
+    @Autowired
+    private val foltiaConfig: FoltiaConfig,
 ) : GraphQLQueryResolver {
     fun subtitle(pId: Long): Subtitle =
         subtitleDao.get(pId) ?: throw IllegalArgumentException("pId $pId is not exists.")
@@ -40,4 +46,12 @@ class QueryResolver(
 
     fun keywordGroups(query: KeywordGroupQueryInput?): List<KeywordGroup> =
         keywordGroupDao.find(query)
+
+    fun diskInfo() =
+        Files.getFileStore(foltiaConfig.recFolderPath.toPath()).let {
+            DiskInfo(
+                totalBytes = it.totalSpace,
+                usableBytes= it.usableSpace
+            )
+        }
 }
