@@ -6,8 +6,11 @@ import com.xxuz.piclane.foltiaapi.model.Subtitle
  * 放送取得結果
  */
 data class SubtitleResult(
-    /** ページインデックス */
-    val page: Int,
+    /** 検索の先頭からのオフセット */
+    val offset: Int,
+
+    /** 検索結果の最大取得件数  */
+    val limit: Int,
 
     /** 総行数 */
     val total: Int,

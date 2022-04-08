@@ -6,8 +6,11 @@ import com.xxuz.piclane.foltiaapi.model.Program
  * 番組取得結果
  */
 data class ProgramResult(
-    /** ページインデックス */
-    val page: Int,
+    /** 検索の先頭からのオフセット */
+    val offset: Int,
+
+    /** 検索結果の最大取得件数  */
+    val limit: Int,
 
     /** 総行数 */
     val total: Int,

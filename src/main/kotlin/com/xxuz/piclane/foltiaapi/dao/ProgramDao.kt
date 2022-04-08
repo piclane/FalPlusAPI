@@ -52,18 +52,18 @@ class ProgramDao(
      * 番組を検索します
      *
      * @param query クエリ
-     * @param page ページインデックス
-     * @param pageRows ページあたりの行数
+     * @param offset 検索の先頭からのオフセット
+     * @param limit 検索結果の最大取得件数
      */
-    fun find(query: ProgramQueryInput?, page: Int, pageRows: Int): ProgramResult {
+    fun find(query: ProgramQueryInput?, offset: Int, limit: Int): ProgramResult {
         val conditions = mutableListOf<String>(
             "tid NOT IN (:tIdKeyword, :tIdEpg)"
         )
         val params = mutableMapOf<String, Any>(
+            "offset" to offset,
+            "limit" to limit,
             "tIdKeyword" to Program.TID_KEYWORD,
             "tIdEpg" to Program.TID_EPG,
-            "limit" to pageRows,
-            "offset" to pageRows * page
         )
 
         if(query?.firstLightAfter != null) {
@@ -132,7 +132,7 @@ class ProgramDao(
             Int::class.java
         )
 
-        return ProgramResult(page, total ?: 0, data)
+        return ProgramResult(offset, limit, total ?: 0, data)
     }
 
     /**

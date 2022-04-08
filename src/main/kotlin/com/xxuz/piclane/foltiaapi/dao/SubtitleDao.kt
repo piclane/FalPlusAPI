@@ -57,14 +57,14 @@ class SubtitleDao(
      * 放送を検索します
      *
      * @param query クエリ
-     * @param page ページインデックス
-     * @param pageRows ページあたりの行数
+     * @param offset 検索の先頭からのオフセット
+     * @param limit 検索結果の最大取得件数
      */
-    fun find(query: SubtitleQueryInput?, page: Int, pageRows: Int): SubtitleResult {
+    fun find(query: SubtitleQueryInput?, offset: Int, limit: Int): SubtitleResult {
         val conditions = mutableListOf<String>()
         val params = mutableMapOf<String, Any>(
-            "limit" to pageRows,
-            "offset" to pageRows * page,
+            "offset" to offset,
+            "limit" to limit,
             "tIdKeyword" to Program.TID_KEYWORD,
             "tIdEpg" to Program.TID_EPG,
         )
@@ -155,7 +155,7 @@ class SubtitleDao(
             Int::class.java
         )
 
-        return SubtitleResult(page, total ?: 0, data)
+        return SubtitleResult(offset, limit, total ?: 0, data)
     }
 
     /**

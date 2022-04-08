@@ -10,19 +10,19 @@ type Query {
     放送を取得します
 
     @param query クエリ
-    @param page ページインデックス
-    @param pageRows ページあたりの行数
+    @param offset 検索の先頭からのオフセット
+    @param limit 検索結果の最大取得件数
     """
-    subtitles(query: SubtitleQueryInput, page: Int!, pageRows: Int! = 100): SubtitleResult!
+    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100): SubtitleResult!
 
     """
     番組を取得します
 
     @param query クエリ
-    @param page ページインデックス
-    @param pageRows ページあたりの行数
+    @param offset 検索の先頭からのオフセット
+    @param limit 検索結果の最大取得件数
     """
-    programs(query: ProgramQueryInput, page: Int!, pageRows: Int! = 100): ProgramResult!
+    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100): ProgramResult!
 
     """
     チャンネルを取得します

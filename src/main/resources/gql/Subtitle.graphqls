@@ -1,7 +1,10 @@
 "放送取得結果"
 type SubtitleResult {
-    "ページインデックス"
-    page: Int!
+    "検索の先頭からのオフセット"
+    offset: Int!
+
+    "検索結果の最大取得件数"
+    limit: Int!
 
     "総行数"
     total: Int!
