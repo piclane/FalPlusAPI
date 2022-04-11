@@ -73,7 +73,7 @@ class SubtitleDao(
             conditions.add("S.tid = :tId")
             params["tId"] = query.tId
         }
-        if(query?.recordingTypes != null) {
+        if(query?.recordingTypes != null && query.recordingTypes.isNotEmpty()) {
             query.recordingTypes
                 .joinToString(" OR ") {
                     when (it) {
