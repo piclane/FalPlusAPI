@@ -24,7 +24,7 @@ class StationDao(
     /**
      * ID からチャンネルを取得します
      */
-    @Cacheable("station")
+    @Cacheable(cacheNames = ["foltia"], key = "'station:stationId=' + #stationId")
     fun get(stationId: Long): Station? =
         try {
             jt.queryForObject(

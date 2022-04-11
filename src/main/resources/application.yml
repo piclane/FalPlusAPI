@@ -10,6 +10,10 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 1GB
+  cache:
+    cache-names: foltia
+    caffeine:
+      spec: expireAfterAccess=10s
 server:
   port: 8090
 logging:

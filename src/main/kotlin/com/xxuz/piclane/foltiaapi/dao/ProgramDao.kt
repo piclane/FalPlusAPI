@@ -27,7 +27,7 @@ class ProgramDao(
     /**
      * ID から放送を取得します
      */
-    @Cacheable("program")
+    @Cacheable(cacheNames = ["foltia"], key = "'program:tId=' + #tId")
     fun get(tId: Long): Program? =
         try {
             jt.queryForObject(

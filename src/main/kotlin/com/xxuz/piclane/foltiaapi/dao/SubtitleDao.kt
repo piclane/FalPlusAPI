@@ -29,7 +29,7 @@ class SubtitleDao(
     /**
      * ID から放送を取得します
      */
-    @Cacheable(cacheNames = ["subtitle"], key = "'pid=' + #pId")
+    @Cacheable(cacheNames = ["foltia"], key = "'subtitle:pId=' + #pId")
     fun get(pId: Long): Subtitle? =
         try {
             jt.queryForObject(
@@ -242,7 +242,7 @@ class SubtitleDao(
         }
 
         // キャッシュの削除
-        cacheMgr.getCache("subtitle")?.evictIfPresent("pId = $pId")
+        cacheMgr.getCache("foltia")?.evictIfPresent("subtitle:pId=$pId")
 
         return get(pId)
     }
@@ -271,7 +271,7 @@ class SubtitleDao(
         }
 
         // キャッシュの削除
-        cacheMgr.getCache("subtitle")?.evictIfPresent("pId = $pId")
+        cacheMgr.getCache("subtitle")?.evictIfPresent("subtitle:pId=$pId")
 
         return subtitle to (get(pId) ?: throw RuntimeException())
     }
