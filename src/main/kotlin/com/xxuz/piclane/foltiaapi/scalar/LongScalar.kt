@@ -15,16 +15,16 @@ val LongScalar = GraphQLScalarType.newScalar()
 /**
  * Long 用の制約インターフェイス
  */
-private class LongCoercing : Coercing<Long, String> {
+private class LongCoercing : Coercing<Long, Long> {
     override fun parseValue(input: Any): Long =
         input.toString().toLong()
 
     override fun parseLiteral(input: Any): Long =
         input.toString().toLong()
 
-    override fun serialize(dataFetcherResult: Any): String? =
+    override fun serialize(dataFetcherResult: Any): Long? =
         if (dataFetcherResult is Long) {
-            dataFetcherResult.toString()
+            dataFetcherResult
         } else {
             null
         }
