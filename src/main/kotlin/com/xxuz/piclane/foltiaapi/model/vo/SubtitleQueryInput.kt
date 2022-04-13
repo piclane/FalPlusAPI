@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.model.vo
 
+import com.xxuz.piclane.foltiaapi.model.Direction
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 
 /**
@@ -37,4 +38,7 @@ data class SubtitleQueryInput(
 
     /** サブタイトル (部分一致) */
     val subtitleContains: String?,
+
+    /** ソート方向 */
+    val direction: Direction?,
 )

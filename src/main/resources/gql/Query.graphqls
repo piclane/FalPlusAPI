@@ -77,6 +77,9 @@ input SubtitleQueryInput {
 
     "サブタイトル (部分一致)"
     subtitleContains: String
+
+    "ソート方向"
+    direction: Direction
 }
 
 "番組クエリ入力"

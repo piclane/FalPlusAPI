@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.dao
 
+import com.xxuz.piclane.foltiaapi.model.Direction
 import com.xxuz.piclane.foltiaapi.model.Program
 import com.xxuz.piclane.foltiaapi.model.vo.SubtitleQueryInput
 import com.xxuz.piclane.foltiaapi.model.Subtitle
@@ -116,6 +117,7 @@ class SubtitleDao(
         }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
+        val direction = if(query?.direction == Direction.Ascending) "ASC" else "DESC"
         val data =  jt.query(
             """
             SELECT
@@ -130,7 +132,7 @@ class SubtitleDao(
             LEFT OUTER JOIN 
                 foltia_nowrecording AS N ON S.pid = N.pid
             $where
-            ORDER BY startdatetime DESC
+            ORDER BY startdatetime $direction
             LIMIT :limit
             OFFSET :offset
             """,
