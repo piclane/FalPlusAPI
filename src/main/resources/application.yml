@@ -15,7 +15,7 @@ spring:
     caffeine:
       spec: expireAfterAccess=10s
 server:
-  port: 8090
+  port: ${PORT:8080}
 logging:
   level:
     org.apache.coyote.http11: warn
