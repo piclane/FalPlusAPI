@@ -70,3 +70,49 @@ tasks.withType<Test> {
 tasks.withType<BootJar> {
     launchScript()
 }
+
+tasks.register("package") {
+    group = "build"
+    description = "Package the distribution for release."
+    dependsOn("bootJar")
+    doLast {
+        ant.withGroovyBuilder {
+            val zipBaseDir = "${buildDir}/package"
+            val zipDir = "${zipBaseDir}/foltia_api-${project.version}"
+            val artifactPath = "${buildDir}/foltia_api-${project.version}-linux-amd64.tar.gz"
+
+            // zipBaseDir をクリア
+            "delete"("dir" to zipBaseDir, "quiet" to true)
+            "mkdir"("dir" to zipDir)
+
+            // 最終成果物をクリア
+            "delete"("file" to artifactPath, "quiet" to true)
+
+            // jar をコピー
+            val jarPath = tasks.getByName("bootJar", org.springframework.boot.gradle.tasks.bundling.BootJar::class)
+                .archiveFile
+                .get()
+                .asFile
+            "copy" ("file" to jarPath, "todir" to zipDir)
+
+            // install.sh / uninstall.sh をコピー
+            "copy" ("file" to "${projectDir}/installer/install.sh", "todir" to zipDir)
+            "copy" ("file" to "${projectDir}/installer/uninstall.sh", "todir" to zipDir)
+            "exec" ("executable" to "chmod") {
+                "arg"("value" to "+x")
+                "arg"("value" to "${zipDir}/install.sh")
+                "arg"("value" to "${zipDir}/uninstall.sh")
+            }
+
+            // README.md をコピー
+            "copy" ("file" to "${projectDir}/README.md", "todir" to zipDir)
+
+            // tar.gz で固める
+            "exec" ("executable" to "tar", "dir" to zipBaseDir) {
+                "arg"("value" to "-zcf")
+                "arg"("value" to artifactPath)
+                "arg"("value" to file(zipDir).name)
+            }
+        }
+    }
+}

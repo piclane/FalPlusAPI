@@ -31,5 +31,3 @@ graphql:
     subscriptions:
       websocket:
         path: /api/subscriptions
-app:
-
