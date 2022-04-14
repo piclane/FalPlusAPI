@@ -1,0 +1,39 @@
+"番組取得結果"
+type ProgramResult {
+    "検索の先頭からのオフセット"
+    offset: Int!
+
+    "検索結果の最大取得件数"
+    limit: Int!
+
+    "総行数"
+    total: Int!
+
+    "ページのデータ"
+    data: [Program!]!
+}
+
+
+"番組"
+type Program {
+    "プライマリキー"
+    tId: Int!
+
+    "タイトル"
+    title: String!
+
+    "番組開始時期"
+    firstLight: LocalDate
+
+    "アスペクト比"
+    aspect: Int
+
+    "タイトル (短縮)"
+    shortTitle: String!
+
+    "タイトル (読み)"
+    titleYomi: String!
+
+    "タイトル (英語)"
+    titleEn: String!
+}

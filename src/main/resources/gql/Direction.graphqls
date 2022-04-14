@@ -1,0 +1,8 @@
+"昇順・降順"
+enum Direction {
+    "昇順"
+    Ascending
+
+    "降順"
+    Descending
+}

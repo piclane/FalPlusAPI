@@ -1,0 +1,295 @@
+"放送取得結果"
+type SubtitleResult {
+    "検索の先頭からのオフセット"
+    offset: Int!
+
+    "検索結果の最大取得件数"
+    limit: Int!
+
+    "総行数"
+    total: Int!
+
+    "ページのデータ"
+    data: [Subtitle!]!
+}
+
+"放送"
+type Subtitle {
+    "放送ID"
+    pId: Int!
+
+    "番組ID (foltia_program.tid に連結)"
+    tId: Int!
+
+    "チャンネルID (foltia_station.stationid に連結)"
+    stationId: Int!
+
+    "話数"
+    countNo: Int
+
+    "サブタイトル"
+    subtitle: String
+
+    "放送開始日時"
+    startDateTime: LocalDateTime!
+
+    "放送終了日時"
+    endDateTime: LocalDateTime!
+
+    "開始時刻オフセット (秒)"
+    startOffset: Int!,
+
+    "放映尺 (分)"
+    lengthMin: Int!
+
+    "TS のファイル名"
+    m2pFilename: String
+
+    "SD 動画ファイル名"
+    pspFilename: String
+
+    "EPG 録画の場合、登録したユーザID そうでない場合 NULL"
+    epgAddedBy: Int
+
+    "最終更新日時"
+    lastUpdate: OffsetDateTime
+
+    "ステータス"
+    fileStatus: FileStatus
+
+    "アスペクト比"
+    aspect: Int
+
+    "トランスコード品質"
+    encodeSetting: TranscodeQuality
+
+    "HD 動画ファイル名"
+    mp4hd: String
+
+    "しょぼいカレンダーフラグ"
+    syobocalFlag: [SyobocalFlag!]!
+
+    "しょぼいカレンダー修正回数"
+    syobocalRev: Int
+
+    # その他
+
+    "録画タイプ"
+    recordingType: RecordingType!
+
+    "放映尺"
+    duration: Duration!
+
+    "チャンネル"
+    station: Station!
+
+    "番組"
+    program: Program!
+
+    "すべてのキーワードグループ"
+    keywordGroups: [KeywordGroup!]
+
+    "TS 動画ファイルへの URI"
+    tsVideoUri: URI
+
+    "SD 動画ファイルへの URI"
+    sdVideoUri: URI
+
+    "HD 動画ファイルへの URI"
+    hdVideoUri: URI
+
+    "ドロップ情報概要"
+    dropInfoSummary: DropInfoSummary
+
+    "パケット識別子ごとのドロップ情報"
+    dropInfoDetail: [DropInfoDetail!]
+
+    "サムネイルの URI"
+    thumbnailUri: URI
+
+    "動画全体のサムネイルの URI"
+    thumbnailUris: [URI!]
+
+    "CM カット情報"
+    cmEdit: CmEdit!
+}
+
+"放送更新入力"
+input SubtitleUpdateInput {
+    "放送ID"
+    pId: Int!
+
+    "サブタイトル"
+    subtitle: String
+
+    "TS のファイル名"
+    m2pFilename: String
+
+    "SD 動画ファイル名"
+    pspFilename: String
+
+    "ステータス"
+    fileStatus: FileStatus
+
+    "トランスコード品質"
+    encodeSetting: TranscodeQuality
+
+    "HD 動画ファイル名"
+    mp4hd: String
+}
+
+"放送動画削除入力"
+input DeleteSubtitleVideoInput {
+    "放送ID"
+    pId: Int
+
+    "動画ファイルの種別"
+    videoTypes: [VideoType!]!
+
+    "物理削除の場合 true そうでない場合 false"
+    physical: Boolean = false
+}
+
+"放送動画アップロード入力"
+input UploadSubtitleVideoInput {
+    "放送ID"
+    pId: Int
+
+    "動画ファイルの種別"
+    videoType: VideoType!
+}
+
+"録画タイプ型"
+enum RecordingType {
+    "アニメ自動録画"
+    Program
+
+    "EPG 録画"
+    Epg
+
+    "キーワード録画"
+    Keyword
+}
+
+"ステータス"
+enum FileStatus {
+    "予約中(5分以上先)"
+    RESERVING_LONG
+
+    "予約中(5分以内)"
+    RESERVING_SHORT
+
+    "録画中"
+    RECORDING
+
+    "TSSplit中"
+    REC_TS_SPLITTING
+
+    "MPEG2録画終了"
+    RECEND
+
+    "静止画キャプチャ待"
+    WAITING_CAPTURE
+
+    "静止画キャプ中"
+    CAPTURE
+
+    "静止画キャプ終了"
+    CAPEND
+
+    "サムネイル作成済み(.THM)"
+    THM_CREATE
+
+    "トラコン待"
+    WAITING_TRANSCODE
+
+    "トラコン中:TSsplit"
+    TRANSCODE_TS_SPLITTING
+
+    "トラコン中:H264"
+    TRANSCODE_FFMPEG
+
+    "トラコン中:WAVE"
+    TRANSCODE_WAVE
+
+    "トラコン中:AAC"
+    TRANSCODE_AAC
+
+    "トラコン中:MP4Box"
+    TRANSCODE_MP4BOX
+
+    "トラコン中:ATOM"
+    TRANSCODE_ATOM
+
+    "トラコン完了"
+    TRANSCODE_COMPLETE
+
+    "HDトラコン待機中"
+    WAITING_HD_TRANSCODE
+
+    "全完了"
+    ALL_COMPLETE
+
+    "変換不能"
+    TRANSCODE_FAILED
+}
+
+"トランスコード品質"
+enum TranscodeQuality {
+    "変換しない"
+    NONE
+
+    "SD のみ"
+    SD
+
+    "HD"
+    HD
+
+    "SD + HD"
+    BOTH
+}
+
+"""
+しょぼいカレンダーフラグ
+https://docs.cal.syoboi.jp/spec/proginfo-flag/
+"""
+enum SyobocalFlag {
+    "注"
+    Attention
+
+    "新番組"
+    New
+
+    "最終回"
+    End
+
+    "再放送"
+    Rerun
+}
+
+"ドロップ情報概要"
+type DropInfoSummary {
+    "全パケット数"
+    totalSum: Int!
+
+    "全ドロップしたパケット数"
+    dropSum: Int!
+
+    "全スクランブルされているパケット数"
+    scramblingSum: Int!
+}
+
+"パケット識別子ごとのドロップ情報"
+type DropInfoDetail {
+    "パケット識別子"
+    pid: Int
+
+    "パケット数"
+    total: Int!
+
+    "ドロップしたパケット数"
+    drop: Int!
+
+    "スクランブルされているパケット数"
+    scrambling: Int!
+}

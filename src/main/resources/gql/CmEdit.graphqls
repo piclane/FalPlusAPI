@@ -1,0 +1,46 @@
+"""
+CM カットに関する情報
+"""
+type CmEdit {
+    "CM カット閾値"
+    detectThreshold: CmEditDetectThreshold!
+
+    "CMカットルール TS"
+    tsRule: CmEditRule!
+
+    "CMカットルール MP4"
+    mp4Rule: CmEditRule!
+}
+
+"CM カット閾値"
+enum CmEditDetectThreshold {
+    "オフ"
+    OFF
+
+    "弱"
+    LOW
+
+    "中"
+    MEDIUM
+
+    "強"
+    HIGH
+}
+
+"CM カットルール"
+enum CmEditRule {
+    "編集しない"
+    DO_NOTHING
+
+    "本編のみ (CMカット)"
+    DELETE_CM
+
+    "CMのみ (本編カット)"
+    LEAVE_ONLY_CM
+
+    "本編+CM(同尺並べ替え)"
+    SORT_CM
+
+    "チャプタ追加"
+    ADD_CHAPTERS
+}

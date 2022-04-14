@@ -1,0 +1,32 @@
+type Mutation {
+    """
+    放送を更新します
+    @param input 放送更新入力
+    @return 更新された放送
+    """
+    updateSubtitle(input: SubtitleUpdateInput!): Subtitle!
+
+    """
+    放送の動画ファイルをアップロードします
+    @param input 放送動画アップロード入力
+    @param video 動画ファイル
+    """
+    uploadSubtitleVideo(input: UploadSubtitleVideoInput!, video: Upload!): Subtitle!
+
+    """
+    放送の動画ファイルを削除します
+    @param input 放送動画削除入力
+    """
+    deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!): Void
+
+    """
+    チャンネルを更新します
+    @param input チャンネル更新入力
+    """
+    updateStation(input: StationUpdateInput): Station
+
+    """
+    トランスコードを開始します
+    """
+    startTranscode: Void
+}

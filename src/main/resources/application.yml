@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${POSTGRESQL_HOST:localhost}:${POSTGRESQL_PORT:5432}/${POSTGRESQL_DB:foltia}
+    username: ${POSTGRESQL_USERNAME:foltia}
+    password: ${POSTGRESQL_PASSWORD}
+    hikari:
+      auto-commit: false
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 1GB
+  cache:
+    cache-names: foltia
+    caffeine:
+      spec: expireAfterAccess=10s
+server:
+  port: ${PORT:8080}
+logging:
+  level:
+    org.apache.coyote.http11: warn
+graphql:
+  servlet:
+    corsEnabled: true
+    cors:
+      allowed-origins: "*"
+      allowed-headers: "*"
+      allowed-methods: "*"
+    actuator-metrics: true
+    mapping: /api/graphql
+    subscriptions:
+      websocket:
+        path: /api/subscriptions

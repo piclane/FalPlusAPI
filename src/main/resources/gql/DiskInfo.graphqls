@@ -1,0 +1,8 @@
+"ディスク情報"
+type DiskInfo {
+    "総容量 (バイト)"
+    totalBytes: Long!
+
+    "使用可能容量 (バイト)"
+    usableBytes: Long!
+}

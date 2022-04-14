@@ -1,0 +1,125 @@
+type Query {
+    """
+    放送を取得します
+
+    @param pId 放送 ID
+    """
+    subtitle(pId: Int!): Subtitle
+
+    """
+    放送を取得します
+
+    @param query クエリ
+    @param offset 検索の先頭からのオフセット
+    @param limit 検索結果の最大取得件数
+    """
+    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100): SubtitleResult!
+
+    """
+    番組を取得します
+
+    @param query クエリ
+    @param offset 検索の先頭からのオフセット
+    @param limit 検索結果の最大取得件数
+    """
+    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100): ProgramResult!
+
+    """
+    チャンネルを取得します
+
+    @param query クエリ
+    """
+    stations(query: StationQueryInput): StationResult!
+
+    """
+    キーワードグループを取得します
+
+    @param query クエリ
+    """
+    keywordGroups(query: KeywordGroupQueryInput): [KeywordGroup!]!
+
+    """
+    ディスク情報を取得します
+    """
+    diskInfo: DiskInfo!
+}
+
+"放送クエリ入力"
+input SubtitleQueryInput {
+    "番組ID"
+    tId: Int
+
+    "録画タイプ"
+    recordingTypes: [RecordingType!]
+
+    """
+    受信可能なチャンネルの放送のみを取得する場合 true
+    受信不能なチャンネルの放送のみを取得する場合 false
+    すべての放送を取得する場合 null
+    """
+    receivableStation: Boolean = true
+
+    """
+    録画が存在する放送を取得する場合 true
+    録画が存在しない放送を取得する場合 false
+    両方の放送を取得する場合 null
+    """
+    hasRecording: Boolean
+
+    """
+    hasRecording=true の場合に、録画中の放送を「録画が存在する」とみなす場合 true
+    そうでない場合 false もしくは null
+    """
+    nowRecording: Boolean
+
+    "キーワードグループID"
+    keywordGroupId: Int
+
+    "サブタイトル (部分一致)"
+    subtitleContains: String
+
+    "ソート方向"
+    direction: Direction
+}
+
+"番組クエリ入力"
+input ProgramQueryInput {
+    "番組開始時期の最小値"
+    firstLightAfter: LocalDate
+
+    "番組開始時期の最大値"
+    firstLightBefore: LocalDate
+
+    "番組タイトル (部分一致)"
+    titleContains: String
+
+    """
+    録画が存在する番組を取得する場合 true
+    録画が存在しない番組を取得する場合 false
+    両方の番組を取得する場合 null
+    """
+    hasRecording: Boolean
+}
+
+"チャンネルクエリ入力"
+input StationQueryInput {
+    """
+    受信可能なチャンネルのみを取得する場合 true
+    受信不能なチャンネルのみを取得する場合 false
+    すべてのチャンネルを取得する場合 null
+    """
+    receivableStation: Boolean = true
+}
+
+"キーワードグループクエリ入力"
+input KeywordGroupQueryInput {
+    """
+    録画が存在するキーワードグループを取得する場合 true
+    録画が存在しないキーワードグループを取得する場合 false
+    両方のキーワードグループを取得する場合 null
+    """
+    hasRecording: Boolean
+
+    "キーワード (部分一致)"
+    keywordContains: String
+}
