@@ -1,4 +1,7 @@
 type Query {
+    "API のバージョンを取得します"
+    version: String!
+
     """
     放送を取得します
 

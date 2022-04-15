@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.xxuz.piclane"
-version = "1.0.0"
+version = "1.0.1"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -30,6 +30,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -69,6 +70,10 @@ tasks.withType<Test> {
 
 tasks.withType<BootJar> {
     launchScript()
+}
+
+springBoot {
+    buildInfo()
 }
 
 tasks.register("package") {

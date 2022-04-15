@@ -11,12 +11,16 @@ import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLQueryResolver
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.info.BuildProperties
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 
 @Component
 @Suppress("unused")
 class QueryResolver(
+    @Autowired 
+    private val buildProperties: BuildProperties,
+
     @Autowired
     private val subtitleDao: SubtitleDao,
 
@@ -32,6 +36,9 @@ class QueryResolver(
     @Autowired
     private val foltiaConfig: FoltiaConfig,
 ) : GraphQLQueryResolver {
+    fun version(): String =
+        buildProperties.version
+    
     fun subtitle(pId: Long): Subtitle =
         subtitleDao.get(pId) ?: throw IllegalArgumentException("pId $pId is not exists.")
 
