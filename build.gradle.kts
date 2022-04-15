@@ -71,6 +71,10 @@ tasks.withType<BootJar> {
     launchScript()
 }
 
+springBoot {
+    buildInfo()
+}
+
 tasks.register("package") {
     group = "build"
     description = "Package the distribution for release."
