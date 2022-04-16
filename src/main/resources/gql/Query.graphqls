@@ -19,6 +19,14 @@ type Query {
     subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100): SubtitleResult!
 
     """
+    指定されたクエリにおける、指定された放送のオフセットを取得します
+
+    @param query クエリ
+    @param pId 放送 IS
+    """
+    subtitleOffset(query: SubtitleQueryInput, pId: Int!): Int
+
+    """
     番組を取得します
 
     @param query クエリ

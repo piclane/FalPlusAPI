@@ -45,6 +45,9 @@ class QueryResolver(
     fun subtitles(query: SubtitleQueryInput?, offset: Int, limit: Int) =
         subtitleDao.find(query, offset, limit)
 
+    fun subtitleOffset(query: SubtitleQueryInput?, pId: Long): Int? =
+        subtitleDao.getSubtitleOffset(query, pId)
+
     fun programs(query: ProgramQueryInput?, offset: Int, limit: Int) =
         programDao.find(query, offset, limit)
 
