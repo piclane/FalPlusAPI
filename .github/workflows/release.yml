@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
 
@@ -14,6 +14,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: adopt
           cache: 'gradle'
 
       - name: "Build with Gradle"
@@ -23,5 +24,5 @@ jobs:
         with:
           draft: true
           generateReleaseNotes: true
-          artifacts: "build/*.jar"
-          token: ${{ secrets.TOKEN_FOR_RELEASE_ACTION }}
+          artifacts: "build/*.tar.gz"
+          token: ${{ secrets.GITHUB_TOKEN }}
