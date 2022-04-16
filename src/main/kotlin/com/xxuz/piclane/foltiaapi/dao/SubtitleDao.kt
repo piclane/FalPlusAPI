@@ -62,13 +62,99 @@ class SubtitleDao(
      * @param limit 検索結果の最大取得件数
      */
     fun find(query: SubtitleQueryInput?, offset: Int, limit: Int): SubtitleResult {
-        val conditions = mutableListOf<String>()
         val params = mutableMapOf<String, Any>(
             "offset" to offset,
             "limit" to limit,
-            "tIdKeyword" to Program.TID_KEYWORD,
-            "tIdEpg" to Program.TID_EPG,
         )
+        val where = buildWhereClause(query, params).let { if(it.isBlank()) "" else "WHERE $it" }
+        val direction = if(query?.direction == Direction.Ascending) "ASC" else "DESC"
+        val data =  jt.query(
+            """
+            SELECT
+                S.*,
+                N.recfilename
+            FROM
+                foltia_subtitle AS S
+            INNER JOIN
+                foltia_program AS P ON S.tid = P.tid
+            INNER JOIN
+                foltia_station AS ST ON S.stationid = ST.stationid
+            LEFT OUTER JOIN 
+                foltia_nowrecording AS N ON S.pid = N.pid
+            $where
+            ORDER BY startdatetime $direction
+            LIMIT :limit
+            OFFSET :offset
+            """,
+            params,
+            RowMapperImpl
+        )
+        val total = jt.queryForObject(
+            """
+            SELECT 
+                COUNT(*)
+            FROM
+                foltia_subtitle AS S
+            INNER JOIN
+                foltia_program AS P ON S.tid = P.tid
+            INNER JOIN
+                foltia_station AS ST ON S.stationid = ST.stationid
+            LEFT OUTER JOIN 
+                foltia_nowrecording AS N ON S.pid = N.pid
+            $where
+            """,
+            params,
+            Int::class.java
+        )
+
+        return SubtitleResult(offset, limit, total ?: 0, data)
+    }
+
+    /**
+     * 指定されたクエリにおける、指定された放送のオフセットを取得します
+     *
+     * @param query クエリ
+     * @param pId 放送 ID
+     */
+    fun getSubtitleOffset(query: SubtitleQueryInput?, pId: Long): Int? {
+        val params = mutableMapOf<String, Any>(
+            "pId" to pId
+        )
+        val where = buildWhereClause(query, params).let { if(it.isBlank()) "" else "WHERE $it" }
+        val direction = if(query?.direction == Direction.Ascending) "ASC" else "DESC"
+        return try {
+            jt.queryForObject(
+                """
+                SELECT
+                    X.ROW_NUM
+                FROM
+                    (SELECT
+                        ROW_NUMBER() OVER (ORDER BY startdatetime $direction) - 1 AS ROW_NUM,
+                        S.pid
+                    FROM
+                        foltia_subtitle AS S
+                    INNER JOIN
+                        foltia_program AS P ON S.tid = P.tid
+                    INNER JOIN
+                        foltia_station AS ST ON S.stationid = ST.stationid
+                    LEFT OUTER JOIN 
+                        foltia_nowrecording AS N ON S.pid = N.pid
+                    $where) AS X
+                WHERE
+                    X.pid = :pId
+                """,
+                params,
+                Int::class.java
+            )
+        } catch (e: EmptyResultDataAccessException) {
+            null
+        }
+    }
+
+    private fun buildWhereClause(query: SubtitleQueryInput?, params: MutableMap<String, Any>): String {
+        val conditions = mutableListOf<String>()
+        params["tIdKeyword"] = Program.TID_KEYWORD
+        params["tIdEpg"] = Program.TID_EPG
 
         if(query?.tId != null) {
             conditions.add("S.tid = :tId")
@@ -116,48 +202,7 @@ class SubtitleDao(
             params["subtitleContains"] = "%${query.subtitleContains}%"
         }
 
-        val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
-        val direction = if(query?.direction == Direction.Ascending) "ASC" else "DESC"
-        val data =  jt.query(
-            """
-            SELECT
-                S.*,
-                N.recfilename
-            FROM
-                foltia_subtitle AS S
-            INNER JOIN
-                foltia_program AS P ON S.tid = P.tid
-            INNER JOIN
-                foltia_station AS ST ON S.stationid = ST.stationid
-            LEFT OUTER JOIN 
-                foltia_nowrecording AS N ON S.pid = N.pid
-            $where
-            ORDER BY startdatetime $direction
-            LIMIT :limit
-            OFFSET :offset
-            """,
-            params,
-            RowMapperImpl
-        )
-        val total = jt.queryForObject(
-            """
-            SELECT 
-                COUNT(*)
-            FROM
-                foltia_subtitle AS S
-            INNER JOIN
-                foltia_program AS P ON S.tid = P.tid
-            INNER JOIN
-                foltia_station AS ST ON S.stationid = ST.stationid
-            LEFT OUTER JOIN 
-                foltia_nowrecording AS N ON S.pid = N.pid
-            $where
-            """,
-            params,
-            Int::class.java
-        )
-
-        return SubtitleResult(offset, limit, total ?: 0, data)
+        return conditions.joinToString(" AND ")
     }
 
     /**
