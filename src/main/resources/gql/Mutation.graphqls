@@ -20,6 +20,17 @@ type Mutation {
     deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!): Void
 
     """
+    クエリに一致した動画ファイルを削除します。
+    削除する動画ファイルの種別は SubtitleQueryInput.videoTypes で指定します。
+    SubtitleQueryInput.videoTypes の指定が無い又は空配列の場合、この処理は 0 を戻して即終了します。
+
+    @param input 放送クエリ入力
+    @param physical 物理削除の場合 true そうでない場合 false
+    @return 削除した動画ファイルの件数
+    """
+    deleteSubtitleVideoByQuery(input: SubtitleQueryInput!, physical: Boolean): Int!
+
+    """
     チャンネルを更新します
     @param input チャンネル更新入力
     """

@@ -5,10 +5,7 @@ import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
 import com.xxuz.piclane.foltiaapi.model.Station
 import com.xxuz.piclane.foltiaapi.model.Subtitle
-import com.xxuz.piclane.foltiaapi.model.vo.DeleteSubtitleVideoInput
-import com.xxuz.piclane.foltiaapi.model.vo.StationUpdateInput
-import com.xxuz.piclane.foltiaapi.model.vo.SubtitleUpdateInput
-import com.xxuz.piclane.foltiaapi.model.vo.UploadSubtitleVideoInput
+import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLMutationResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -38,6 +35,39 @@ class MutationResolver(
         input.forEach {
             foltiaManipulation.deleteSubtitleVideo(it)
         }
+    }
+
+    fun deleteSubtitleVideoByQuery(input: SubtitleQueryInput, physical: Boolean): Int {
+        if(input.videoTypes?.isEmpty() == true) {
+            return 0
+        }
+        val videoTypes = input.videoTypes!!
+        val limit = 100
+        var offset = 0
+        var count = 0
+        while(true) {
+            val result = subtitleDao.find(input, offset, limit)
+            if(result.data.isEmpty()) {
+                break
+            }
+            result.data
+                .asSequence()
+                .map { subtitle ->
+                    DeleteSubtitleVideoInput(
+                        pId = subtitle.pId,
+                        videoTypes = videoTypes,
+                        physical = physical
+                    )
+                }
+                .also {
+                    count += it.count() * videoTypes.size
+                }
+                .forEach {
+                    foltiaManipulation.deleteSubtitleVideo(it)
+                }
+            offset += limit
+        }
+        return count
     }
 
     fun updateStation(input: StationUpdateInput): Station {
