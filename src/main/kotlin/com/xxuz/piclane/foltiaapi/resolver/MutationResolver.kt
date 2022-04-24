@@ -3,12 +3,15 @@ package com.xxuz.piclane.foltiaapi.resolver
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
+import com.xxuz.piclane.foltiaapi.model.LiveQuality
+import com.xxuz.piclane.foltiaapi.model.vo.LiveResult
 import com.xxuz.piclane.foltiaapi.model.Station
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLMutationResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import javax.annotation.PreDestroy
 import javax.servlet.http.Part
 
 @Component
@@ -74,6 +77,15 @@ class MutationResolver(
         stationDao.update(input)
         return stationDao.get(input.stationId) ?: throw IllegalArgumentException("stationId ${input.stationId} does not exist.")
     }
+
+    fun startLive(stationId: Long, liveQuality: LiveQuality): LiveResult =
+        foltiaManipulation.startLive(stationId, liveQuality)
+
+    fun stopLive(liveId: String) =
+        foltiaManipulation.stopLive(liveId)
+
+    fun stopLiveAll() =
+        foltiaManipulation.stopLiveAll()
 
     fun startTranscode() {
         foltiaManipulation.startTranscode()

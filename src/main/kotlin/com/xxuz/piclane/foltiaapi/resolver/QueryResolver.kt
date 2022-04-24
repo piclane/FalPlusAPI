@@ -5,6 +5,7 @@ import com.xxuz.piclane.foltiaapi.dao.ProgramDao
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaConfig
+import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
 import com.xxuz.piclane.foltiaapi.model.DiskInfo
 import com.xxuz.piclane.foltiaapi.model.KeywordGroup
 import com.xxuz.piclane.foltiaapi.model.Subtitle
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.info.BuildProperties
 import org.springframework.stereotype.Component
 import java.nio.file.Files
+import java.time.Duration
 
 @Component
 @Suppress("unused")
@@ -35,6 +37,9 @@ class QueryResolver(
 
     @Autowired
     private val foltiaConfig: FoltiaConfig,
+
+    @Autowired
+    private val foltiaManipulation: FoltiaManipulation,
 ) : GraphQLQueryResolver {
     fun version(): String =
         buildProperties.version
@@ -56,6 +61,9 @@ class QueryResolver(
 
     fun keywordGroups(query: KeywordGroupQueryInput?): List<KeywordGroup> =
         keywordGroupDao.find(query)
+
+    fun getLiveDuration(liveId: String): Duration =
+        foltiaManipulation.getLiveDuration(liveId)
 
     fun diskInfo() =
         Files.getFileStore(foltiaConfig.recFolderPath.toPath()).let {

@@ -22,7 +22,7 @@ type Query {
     指定されたクエリにおける、指定された放送のオフセットを取得します
 
     @param query クエリ
-    @param pId 放送 IS
+    @param pId 放送 ID
     """
     subtitleOffset(query: SubtitleQueryInput, pId: Int!): Int
 
@@ -48,6 +48,13 @@ type Query {
     @param query クエリ
     """
     keywordGroups(query: KeywordGroupQueryInput): [KeywordGroup!]!
+
+    """
+    ライブのバッファされている秒数を取得します
+
+    @param liveId ライブID
+    """
+    getLiveDuration(liveId: String!): Duration!
 
     """
     ディスク情報を取得します
