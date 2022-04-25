@@ -98,6 +98,15 @@ type Subtitle {
     "HD 動画ファイルへの URI"
     hdVideoUri: URI
 
+    "TS 動画の容量 (バイト)"
+    tsVideoSize: Long
+
+    "SD 動画の容量 (バイト)"
+    sdVideoSize: Long
+
+    "HD 動画の容量 (バイト)"
+    hdVideoSize: Long
+
     "ドロップ情報概要"
     dropInfoSummary: DropInfoSummary
 

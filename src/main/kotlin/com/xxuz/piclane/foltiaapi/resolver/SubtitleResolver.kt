@@ -54,6 +54,15 @@ class SubtitleResolver(
     fun hdVideoUri(subtitle: Subtitle): URI? =
         foltiaConfig.hdVideoUri(subtitle)
 
+    fun tsVideoSize(subtitle: Subtitle): Long? =
+        foltiaConfig.tsVideoPath(subtitle)?.length()
+
+    fun sdVideoSize(subtitle: Subtitle): Long? =
+        foltiaConfig.sdVideoPath(subtitle)?.length()
+
+    fun hdVideoSize(subtitle: Subtitle): Long? =
+        foltiaConfig.hdVideoPath(subtitle)?.length()
+
     fun dropInfoSummary(subtitle: Subtitle): DropInfoSummary? =
         foltiaManipulation.loadDropInfo(subtitle)
 
