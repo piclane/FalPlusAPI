@@ -1,0 +1,89 @@
+"""
+EPG
+"""
+type Epg {
+    "EPG ID"
+    epgId: Long!
+    
+    "開始日時"
+    startDateTime: LocalDateTime!
+    
+    "終了日時"
+    endDateTime: LocalDateTime!
+    
+    "onTvChannel (onTvCode)"
+    onTvChannel: String!
+    
+    "番組名"
+    title: String!
+    
+    "説明"
+    description: String!
+    
+    "カテゴリ"
+    category: EpgCategory!
+}
+
+"""
+EPG カテゴリー
+"""
+enum EpgCategory {
+    "情報"
+    INFORMATION
+
+    "趣味・実用"
+    HOBBY
+
+    "教育"
+    EDUCATION
+
+    "音楽"
+    MUSIC
+
+    "演劇"
+    STAGE
+
+    "映画"
+    CINEMA
+
+    "バラエティ"
+    VARIETY
+
+    "ニュース・報道"
+    NEWS
+
+    "ドラマ"
+    DRAMA
+
+    "ドキュメンタリー・教養"
+    DOCUMENTARY
+
+    "スポーツ"
+    SPORTS
+
+    "キッズ"
+    KIDS
+
+    "アニメ・特撮"
+    ANIME
+
+    "その他"
+    ETC
+}
+
+"""
+EPG クエリ入力
+"""
+input EpgQueryInput {
+    "指定された日時より前に始まる"
+    startBefore: LocalDateTime
+
+    "指定された日時より後に始まる"
+    startAfter: LocalDateTime
+
+    "指定された日時より前に終わる"
+    endBefore: LocalDateTime
+
+    "指定された日時より後に終わる"
+    endAfter: LocalDateTime
+}

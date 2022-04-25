@@ -38,6 +38,12 @@ type Station {
 
     "CM 検出閾値"
     cmEditDetectThreshold: CmEditDetectThreshold
+
+    "EPG 番組"
+    epg(query: EpgQueryInput): [Epg!]!
+
+    "放送中の EPG 番組"
+    epgNow: Epg
 }
 
 "チャンネル更新入力"
