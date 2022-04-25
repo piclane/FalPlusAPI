@@ -60,6 +60,10 @@ class StationDao(
             conditions.add("receiving = :receiving")
             params["receiving"] = if(query.receivableStation) 1 else 0
         }
+        if(query?.digitalStationBands != null && query.digitalStationBands.isNotEmpty()) {
+            val options =  query.digitalStationBands.map { it.code }.joinToString(", ")
+            conditions.add("digitalstationband IN (${options})")
+        }
 
         val data = jt.query(
             """

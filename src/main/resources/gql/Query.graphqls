@@ -136,6 +136,11 @@ input StationQueryInput {
     すべてのチャンネルを取得する場合 null
     """
     receivableStation: Boolean = true
+
+    """
+    チャンネル種別
+    """
+    digitalStationBands: [DigitalStationBand!]
 }
 
 "キーワードグループクエリ入力"
