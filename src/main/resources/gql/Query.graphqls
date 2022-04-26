@@ -107,6 +107,12 @@ input SubtitleQueryInput {
 
     "ソート方向"
     direction: Direction
+
+    """
+    ステータス
+    指定されたステータスを含む放送のみを取得します
+    """
+    fileStatuses: [FileStatus!]
 }
 
 "番組クエリ入力"

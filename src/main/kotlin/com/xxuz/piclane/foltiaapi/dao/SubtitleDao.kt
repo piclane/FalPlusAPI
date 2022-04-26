@@ -214,6 +214,9 @@ class SubtitleDao(
             conditions.add("S.subtitle LIKE :subtitleContains")
             params["subtitleContains"] = "%${query.subtitleContains}%"
         }
+        if(query?.fileStatuses != null && query.fileStatuses.isNotEmpty()) {
+            conditions.add("S.filestatus IN (${query.fileStatuses.map { it.code }.joinToString(", ")})")
+        }
 
         return conditions.joinToString(" AND ")
     }

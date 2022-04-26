@@ -50,4 +50,10 @@ data class SubtitleQueryInput(
 
     /** ソート方向 */
     val direction: Direction?,
+
+    /**
+     * ステータス
+     * 指定されたステータスを含む放送のみを取得します
+     */
+    val fileStatuses: Set<Subtitle.FileStatus>?,
 )
