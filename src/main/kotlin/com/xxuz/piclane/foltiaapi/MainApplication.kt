@@ -53,5 +53,8 @@ class MainApplication {
     fun getUriScalar() = UriScalar
 
     @Bean
+    fun getJobScalar() = JobScalar
+
+    @Bean
     fun getLongScalar() = LongScalar
 }

@@ -6,6 +6,7 @@ import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaConfig
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
+import com.xxuz.piclane.foltiaapi.job.JobManager
 import com.xxuz.piclane.foltiaapi.model.DiskInfo
 import com.xxuz.piclane.foltiaapi.model.KeywordGroup
 import com.xxuz.piclane.foltiaapi.model.Subtitle
@@ -40,6 +41,9 @@ class QueryResolver(
 
     @Autowired
     private val foltiaManipulation: FoltiaManipulation,
+
+    @Autowired
+    private val jobManager: JobManager,
 ) : GraphQLQueryResolver {
     fun version(): String =
         buildProperties.version
@@ -72,4 +76,7 @@ class QueryResolver(
                 usableBytes= it.usableSpace
             )
         }
+
+    fun jobProgress(job: String): Float =
+        jobManager.get(job)?.progress() ?: 1.0f
 }

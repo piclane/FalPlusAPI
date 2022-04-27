@@ -62,6 +62,11 @@ type Query {
     ディスク情報を取得します
     """
     diskInfo: DiskInfo!
+
+    """
+    ジョブの進捗を0〜1の間で取得します
+    """
+    jobProgress(job: Job!): Float
 }
 
 "放送クエリ入力"

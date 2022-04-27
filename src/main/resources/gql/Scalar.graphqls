@@ -38,6 +38,11 @@ URI 型
 scalar URI
 
 """
+Job 型
+"""
+scalar Job
+
+"""
 Long 型
 """
 scalar Long
