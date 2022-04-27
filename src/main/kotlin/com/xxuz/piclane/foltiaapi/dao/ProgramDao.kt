@@ -1,6 +1,7 @@
 package com.xxuz.piclane.foltiaapi.dao
 
 import com.xxuz.piclane.foltiaapi.model.Program
+import com.xxuz.piclane.foltiaapi.model.VideoType
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramQueryInput
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramResult
 import org.springframework.beans.factory.annotation.Autowired
@@ -103,6 +104,22 @@ class ProgramDao(
                     S.mp4hd IS NULL
                 )
             )""".trimIndent())
+        }
+        if(query?.videoTypes?.isNotEmpty() == true) {
+            mutableListOf<String>()
+                .also {
+                    if(query.videoTypes.contains(VideoType.TS)) it.add("(S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename))")
+                    if(query.videoTypes.contains(VideoType.SD)) it.add("(S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename))")
+                    if(query.videoTypes.contains(VideoType.HD)) it.add("(S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))")
+                }
+                .joinToString(" OR ")
+                .also {
+                    conditions.add("""EXISTS(
+                        SELECT 1
+                        FROM foltia_subtitle AS S 
+                        WHERE S.tid = P.tid AND (${it})
+                    )""".trimIndent())
+                }
         }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"

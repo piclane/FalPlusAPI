@@ -132,8 +132,17 @@ input ProgramQueryInput {
     録画が存在する番組を取得する場合 true
     録画が存在しない番組を取得する場合 false
     両方の番組を取得する場合 null
+    videoTypes と同時に指定された場合の挙動は未定義です。
     """
     hasRecording: Boolean
+
+    """
+    動画ファイル種別
+    指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+    空の配列が渡された場合および無指定の場合は、このフィルタは無視されます。
+    hasRecording と同時に指定された場合の挙動は未定義です。
+    """
+    videoTypes: [VideoType!]
 }
 
 "チャンネルクエリ入力"
@@ -157,8 +166,17 @@ input KeywordGroupQueryInput {
     録画が存在するキーワードグループを取得する場合 true
     録画が存在しないキーワードグループを取得する場合 false
     両方のキーワードグループを取得する場合 null
+    videoTypes と同時に指定された場合の挙動は未定義です。
     """
     hasRecording: Boolean
+
+    """
+    動画ファイル種別
+    指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+    空の配列が渡された場合および無指定の場合は、このフィルタは無視されます。
+    hasRecording と同時に指定された場合の挙動は未定義です。
+    """
+    videoTypes: [VideoType!]
 
     "キーワード (部分一致)"
     keywordContains: String
