@@ -3,12 +3,14 @@ package com.xxuz.piclane.foltiaapi.resolver
 import com.xxuz.piclane.foltiaapi.dao.StationDao
 import com.xxuz.piclane.foltiaapi.dao.SubtitleDao
 import com.xxuz.piclane.foltiaapi.foltia.FoltiaManipulation
+import com.xxuz.piclane.foltiaapi.job.JobManager
 import com.xxuz.piclane.foltiaapi.model.LiveQuality
 import com.xxuz.piclane.foltiaapi.model.vo.LiveResult
 import com.xxuz.piclane.foltiaapi.model.Station
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.vo.*
 import graphql.kickstart.tools.GraphQLMutationResolver
+import kotlinx.coroutines.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import javax.annotation.PreDestroy
@@ -16,6 +18,7 @@ import javax.servlet.http.Part
 
 @Component
 @Suppress("unused")
+@ObsoleteCoroutinesApi
 class MutationResolver(
     @Autowired
     private val subtitleDao: SubtitleDao,
@@ -25,7 +28,18 @@ class MutationResolver(
 
     @Autowired
     private val foltiaManipulation: FoltiaManipulation,
+
+    @Autowired
+    private val jobManager: JobManager,
 ) : GraphQLMutationResolver {
+    /** 動画削除用スレッドプール */
+    private val deleteVideoThreadPoolContext = newFixedThreadPoolContext(4, "DeleteVideoThreadPool")
+
+    @PreDestroy
+    fun shutdown() {
+        deleteVideoThreadPoolContext.close()
+    }
+
     fun updateSubtitle(input: SubtitleUpdateInput): Subtitle {
         subtitleDao.update(input)
         return subtitleDao.get(input.pId) ?: throw IllegalArgumentException("pId ${input.pId} does not exist.")
@@ -34,20 +48,25 @@ class MutationResolver(
     fun uploadSubtitleVideo(input: UploadSubtitleVideoInput, video: Part): Subtitle =
         foltiaManipulation.uploadSubtitleVideo(input, video)
 
-    fun deleteSubtitleVideo(input: List<DeleteSubtitleVideoInput>) {
+    fun deleteSubtitleVideo(input: List<DeleteSubtitleVideoInput>, physical: Boolean): String {
+        val jobs = jobManager.issue(deleteVideoThreadPoolContext)
         input.forEach {
-            foltiaManipulation.deleteSubtitleVideo(it)
+            jobs.schedule {
+                foltiaManipulation.deleteSubtitleVideo(it, physical)
+            }
         }
+        jobs.start()
+        return jobs.jobId
     }
 
-    fun deleteSubtitleVideoByQuery(input: SubtitleQueryInput, physical: Boolean): Int {
+    fun deleteSubtitleVideoByQuery(input: SubtitleQueryInput, physical: Boolean): String {
+        val jobs = jobManager.issue(deleteVideoThreadPoolContext)
         if(input.videoTypes?.isEmpty() == true) {
-            return 0
+            return jobs.jobId
         }
         val videoTypes = input.videoTypes!!
         val limit = 100
         var offset = 0
-        var count = 0
         while(true) {
             val result = subtitleDao.find(input, offset, limit)
             if(result.data.isEmpty()) {
@@ -55,22 +74,23 @@ class MutationResolver(
             }
             result.data
                 .asSequence()
-                .map { subtitle ->
-                    DeleteSubtitleVideoInput(
-                        pId = subtitle.pId,
-                        videoTypes = videoTypes,
-                        physical = physical
-                    )
-                }
-                .also {
-                    count += it.count() * videoTypes.size
+                .flatMap { subtitle ->
+                    videoTypes.map { videoType ->
+                        DeleteSubtitleVideoInput(
+                            pId = subtitle.pId,
+                            videoTypes = setOf(videoType),
+                        )
+                    }
                 }
                 .forEach {
-                    foltiaManipulation.deleteSubtitleVideo(it)
+                    jobs.schedule {
+                        foltiaManipulation.deleteSubtitleVideo(it, physical)
+                    }
                 }
             offset += limit
         }
-        return count
+        jobs.start()
+        return jobs.jobId
     }
 
     fun updateStation(input: StationUpdateInput): Station {

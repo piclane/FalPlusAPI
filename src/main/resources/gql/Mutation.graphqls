@@ -20,7 +20,7 @@ type Mutation {
 
     @param input 放送動画削除入力
     """
-    deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!): Void
+    deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!, physical: Boolean! = false): Job!
 
     """
     クエリに一致した動画ファイルを削除します。
@@ -31,7 +31,7 @@ type Mutation {
     @param physical 物理削除の場合 true そうでない場合 false
     @return 削除した動画ファイルの件数
     """
-    deleteSubtitleVideoByQuery(input: SubtitleQueryInput!, physical: Boolean): Int!
+    deleteSubtitleVideoByQuery(input: SubtitleQueryInput!, physical: Boolean! = false): Job!
 
     """
     チャンネルを更新します

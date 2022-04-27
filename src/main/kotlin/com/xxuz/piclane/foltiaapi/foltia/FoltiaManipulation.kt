@@ -23,7 +23,6 @@ import java.io.FileOutputStream
 import java.nio.file.Files
 import java.time.Duration
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicReference
 import javax.annotation.PreDestroy
 import javax.servlet.http.Part
@@ -50,15 +49,6 @@ class FoltiaManipulation(
     private val txMgr: PlatformTransactionManager,
 ) {
     private val logger = LoggerFactory.getLogger(FoltiaManipulation::class.java)
-
-    private var esNextId = 1
-    private val es = Executors.newFixedThreadPool(5) { r ->
-        Thread(r).also {
-            it.name = "Foltia Manipulation Thread - ${esNextId++}"
-            it.isDaemon = true
-            it.priority = Thread.MIN_PRIORITY
-        }
-    }
 
     /**
      * 終了
@@ -125,13 +115,11 @@ class FoltiaManipulation(
     /**
      * 放送の動画を削除します
      */
-    fun deleteSubtitleVideo(target: DeleteSubtitleVideoInput) {
-        es.submit {
-            if(target.physical)
-                deleteSubtitleVideoPhysically(target)
-            else
-                deleteSubtitleVideoLogically(target)
-        }
+    fun deleteSubtitleVideo(target: DeleteSubtitleVideoInput, physical: Boolean) {
+        if(physical)
+            deleteSubtitleVideoPhysically(target)
+        else
+            deleteSubtitleVideoLogically(target)
     }
 
     /**

@@ -157,9 +157,6 @@ input DeleteSubtitleVideoInput {
 
     "動画ファイルの種別"
     videoTypes: [VideoType!]!
-
-    "物理削除の場合 true そうでない場合 false"
-    physical: Boolean = false
 }
 
 "放送動画アップロード入力"
