@@ -47,14 +47,14 @@ class QueryResolver(
     fun subtitle(pId: Long): Subtitle =
         subtitleDao.get(pId) ?: throw IllegalArgumentException("pId $pId is not exists.")
 
-    fun subtitles(query: SubtitleQueryInput?, offset: Int, limit: Int) =
-        subtitleDao.find(query, offset, limit)
+    fun subtitles(query: SubtitleQueryInput?, offset: Int, limit: Int, contextData: String?) =
+        subtitleDao.find(query, offset, limit, contextData)
 
     fun subtitleOffset(query: SubtitleQueryInput?, pId: Long): Int? =
         subtitleDao.getSubtitleOffset(query, pId)
 
-    fun programs(query: ProgramQueryInput?, offset: Int, limit: Int) =
-        programDao.find(query, offset, limit)
+    fun programs(query: ProgramQueryInput?, offset: Int, limit: Int, contextData: String?) =
+        programDao.find(query, offset, limit, contextData)
 
     fun stations(query: StationQueryInput?): StationResult =
         stationDao.find(query)

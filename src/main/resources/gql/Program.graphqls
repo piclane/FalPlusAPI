@@ -6,6 +6,9 @@ type ProgramResult {
     "検索結果の最大取得件数"
     limit: Int!
 
+    "任意のコンテキストデータ"
+    contextData: String
+
     "総行数"
     total: Int!
 

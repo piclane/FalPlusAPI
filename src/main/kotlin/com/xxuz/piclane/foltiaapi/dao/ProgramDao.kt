@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -54,8 +53,9 @@ class ProgramDao(
      * @param query クエリ
      * @param offset 検索の先頭からのオフセット
      * @param limit 検索結果の最大取得件数
+     * @param contextData 任意のコンテキストデータ
      */
-    fun find(query: ProgramQueryInput?, offset: Int, limit: Int): ProgramResult {
+    fun find(query: ProgramQueryInput?, offset: Int, limit: Int, contextData: String? = null): ProgramResult {
         val conditions = mutableListOf<String>(
             "tid NOT IN (:tIdKeyword, :tIdEpg)"
         )
@@ -132,7 +132,7 @@ class ProgramDao(
             Int::class.java
         )
 
-        return ProgramResult(offset, limit, total ?: 0, data)
+        return ProgramResult(offset, limit, contextData, total ?: 0, data)
     }
 
     /**

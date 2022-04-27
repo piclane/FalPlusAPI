@@ -60,8 +60,9 @@ class SubtitleDao(
      * @param query クエリ
      * @param offset 検索の先頭からのオフセット
      * @param limit 検索結果の最大取得件数
+     * @param contextData 任意のコンテキストデータ
      */
-    fun find(query: SubtitleQueryInput?, offset: Int, limit: Int): SubtitleResult {
+    fun find(query: SubtitleQueryInput?, offset: Int, limit: Int, contextData: String? = null): SubtitleResult {
         val params = mutableMapOf<String, Any>(
             "offset" to offset,
             "limit" to limit,
@@ -107,7 +108,7 @@ class SubtitleDao(
             Int::class.java
         )
 
-        return SubtitleResult(offset, limit, total ?: 0, data)
+        return SubtitleResult(offset, limit, contextData, total ?: 0, data)
     }
 
     /**

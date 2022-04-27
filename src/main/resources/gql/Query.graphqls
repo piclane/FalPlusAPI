@@ -15,8 +15,9 @@ type Query {
     @param query クエリ
     @param offset 検索の先頭からのオフセット
     @param limit 検索結果の最大取得件数
+    @param contextData 任意のコンテキストデータ
     """
-    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100): SubtitleResult!
+    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100, contextData: String = null): SubtitleResult!
 
     """
     指定されたクエリにおける、指定された放送のオフセットを取得します
@@ -32,8 +33,9 @@ type Query {
     @param query クエリ
     @param offset 検索の先頭からのオフセット
     @param limit 検索結果の最大取得件数
+    @param contextData 任意のコンテキストデータ
     """
-    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100): ProgramResult!
+    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100, contextData: String = null): ProgramResult!
 
     """
     チャンネルを取得します
