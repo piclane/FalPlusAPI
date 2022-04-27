@@ -76,7 +76,7 @@ class KeywordGroupDao(
                 SELECT 1
                 FROM foltia_subtitle AS S
                 INNER JOIN foltia_keywordlibfiles AS F ON S.countno = F.countno
-                WHERE S.tid = :tidKeyword AND (
+                WHERE S.tid = :tidKeyword AND F.keywordgroupid = W.keywordgroupid AND (
                     (S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename)) OR
                     (S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename)) OR
                     (S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))
@@ -88,7 +88,7 @@ class KeywordGroupDao(
                 SELECT 1
                 FROM foltia_subtitle AS S 
                 INNER JOIN foltia_keywordlibfiles AS F ON S.countno = F.countno
-                WHERE S.tid = :tidKeyword AND (
+                WHERE S.tid = :tidKeyword AND F.keywordgroupid = W.keywordgroupid AND (
                     S.m2pfilename IS NULL AND
                     S.pspfilename IS NULL AND
                     S.mp4hd IS NULL
