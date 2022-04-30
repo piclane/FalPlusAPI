@@ -1,7 +1,9 @@
 package com.xxuz.piclane.foltiaapi.scalar
 
+import graphql.language.IntValue
 import graphql.schema.Coercing
 import graphql.schema.GraphQLScalarType
+import java.math.BigInteger
 
 /**
  * Long スカラ型
@@ -17,10 +19,16 @@ val LongScalar = GraphQLScalarType.newScalar()
  */
 private class LongCoercing : Coercing<Long, Long> {
     override fun parseValue(input: Any): Long =
-        input.toString().toLong()
+        if(input is IntValue)
+            input.value.toLong()
+        else
+            input.toString().toLong()
 
     override fun parseLiteral(input: Any): Long =
-        input.toString().toLong()
+        if(input is IntValue)
+            input.value.toLong()
+        else
+            input.toString().toLong()
 
     override fun serialize(dataFetcherResult: Any): Long? =
         if (dataFetcherResult is Long) {

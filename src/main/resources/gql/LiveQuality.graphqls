@@ -1,0 +1,61 @@
+enum LiveQuality {
+    """
+    Audio: bitRate=256Kbps samplingRate=44.1KHz
+    Video: bitRate=4500Kbps size=1280x720 frameRate=29.97fps gop=90
+    """
+    Q10
+
+    """
+    Audio: bitRate=160Kbps samplingRate=44.1KHz
+    Video: bitRate=2500Kbps size=1280x720 frameRate=29.97fps gop=90
+    """
+    Q9
+
+    """
+    Audio: bitRate=128Kbps samplingRate=44.1KHz
+    Video: bitRate=2000Kbps size=1024x576 frameRate=29.97fps gop=90
+    """
+    Q8
+
+    """
+    Audio: bitRate=128Kbps samplingRate=44.1KHz
+    Video: bitRate=1800Kbps size=960x540 frameRate=29.97fps gop=90
+    """
+    Q7
+
+    """
+    Audio: bitRate=128Kbps samplingRate=44.1KHz
+    Video: bitRate=1168Kbps size=640x360 frameRate=29.97fps gop=90
+    """
+    Q6
+
+    """
+    Audio: bitRate=128Kbps samplingRate=32.0KHz
+    Video: bitRate=760Kbps size=640x360 frameRate=29.97fps gop=90
+    """
+    Q5
+
+    """
+    Audio: bitRate=128Kbps samplingRate=32.0KHz
+    Video: bitRate=600Kbps size=640x360 frameRate=29.97fps gop=90
+    """
+    Q4
+
+    """
+    Audio: bitRate=96Kbps samplingRate=32.0KHz
+    Video: bitRate=400Kbps size=400x224 frameRate=29.97fps gop=90
+    """
+    Q3
+
+    """
+    Audio: bitRate=48Kbps samplingRate=32.0KHz
+    Video: bitRate=200Kbps size=400x224 frameRate=14.985fps gop=45
+    """
+    Q2
+
+    """
+    Audio: bitRate=48Kbps samplingRate=32.0KHz
+    Video: bitRate=110Kbps size=400x224 frameRate=9.99fps gop=30
+    """
+    Q1
+}

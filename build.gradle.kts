@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.xxuz.piclane"
-version = "1.0.2"
+version = "1.0.3"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -23,23 +23,39 @@ repositories {
 }
 
 dependencies {
+    // graphql-java-kickstart
     implementation("com.graphql-java-kickstart:graphql-spring-boot-starter:12.0.0")
     implementation("com.graphql-java-kickstart:graphql-java-tools:12.0.2")
 
+    // spring-boot
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+    // kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    runtimeOnly("org.postgresql:postgresql")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    // avoid CVE-2021-37136
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.2")
 
+
+    // JDBC
+    runtimeOnly("org.postgresql:postgresql:42.3.4")
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // TEST
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // graphql-java-kickstart
     testImplementation("com.graphql-java-kickstart:graphql-spring-boot-starter-test:12.0.0")
 
+    // spring-boot
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }

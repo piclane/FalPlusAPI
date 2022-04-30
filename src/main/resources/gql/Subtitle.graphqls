@@ -6,6 +6,9 @@ type SubtitleResult {
     "検索結果の最大取得件数"
     limit: Int!
 
+    "任意のコンテキストデータ"
+    contextData: String
+
     "総行数"
     total: Int!
 
@@ -98,6 +101,15 @@ type Subtitle {
     "HD 動画ファイルへの URI"
     hdVideoUri: URI
 
+    "TS 動画の容量 (バイト)"
+    tsVideoSize: Long
+
+    "SD 動画の容量 (バイト)"
+    sdVideoSize: Long
+
+    "HD 動画の容量 (バイト)"
+    hdVideoSize: Long
+
     "ドロップ情報概要"
     dropInfoSummary: DropInfoSummary
 
@@ -145,9 +157,6 @@ input DeleteSubtitleVideoInput {
 
     "動画ファイルの種別"
     videoTypes: [VideoType!]!
-
-    "物理削除の場合 true そうでない場合 false"
-    physical: Boolean = false
 }
 
 "放送動画アップロード入力"

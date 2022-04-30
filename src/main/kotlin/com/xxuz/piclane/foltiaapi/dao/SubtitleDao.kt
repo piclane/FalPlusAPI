@@ -60,8 +60,9 @@ class SubtitleDao(
      * @param query クエリ
      * @param offset 検索の先頭からのオフセット
      * @param limit 検索結果の最大取得件数
+     * @param contextData 任意のコンテキストデータ
      */
-    fun find(query: SubtitleQueryInput?, offset: Int, limit: Int): SubtitleResult {
+    fun find(query: SubtitleQueryInput?, offset: Int, limit: Int, contextData: String? = null): SubtitleResult {
         val params = mutableMapOf<String, Any>(
             "offset" to offset,
             "limit" to limit,
@@ -107,7 +108,7 @@ class SubtitleDao(
             Int::class.java
         )
 
-        return SubtitleResult(offset, limit, total ?: 0, data)
+        return SubtitleResult(offset, limit, contextData, total ?: 0, data)
     }
 
     /**
@@ -185,6 +186,19 @@ class SubtitleDao(
         } else if(query?.hasRecording == false) {
             conditions.add("(S.m2pfilename IS NULL AND S.pspfilename IS NULL AND S.mp4hd IS NULL)")
         }
+        if(query?.videoTypes?.isNotEmpty() == true) {
+            mutableListOf<String>()
+                .also {
+                    if(query.nowRecording == true) it.add("N.recfilename IS NOT NULL")
+                    if(query.videoTypes.contains(VideoType.TS)) it.add("(S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename))")
+                    if(query.videoTypes.contains(VideoType.SD)) it.add("(S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename))")
+                    if(query.videoTypes.contains(VideoType.HD)) it.add("(S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))")
+                }
+                .joinToString(" OR ", prefix = "(", postfix = ")")
+                .also {
+                    conditions.add(it)
+                }
+        }
         if(query?.keywordGroupId != null) {
             conditions.add("""
                 S.tid = :tIdKeyword AND 
@@ -200,6 +214,9 @@ class SubtitleDao(
         if(query?.subtitleContains != null) {
             conditions.add("S.subtitle LIKE :subtitleContains")
             params["subtitleContains"] = "%${query.subtitleContains}%"
+        }
+        if(query?.fileStatuses != null && query.fileStatuses.isNotEmpty()) {
+            conditions.add("S.filestatus IN (${query.fileStatuses.map { it.code }.joinToString(", ")})")
         }
 
         return conditions.joinToString(" AND ")

@@ -15,14 +15,15 @@ type Query {
     @param query クエリ
     @param offset 検索の先頭からのオフセット
     @param limit 検索結果の最大取得件数
+    @param contextData 任意のコンテキストデータ
     """
-    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100): SubtitleResult!
+    subtitles(query: SubtitleQueryInput, offset: Int!, limit: Int! = 100, contextData: String = null): SubtitleResult!
 
     """
     指定されたクエリにおける、指定された放送のオフセットを取得します
 
     @param query クエリ
-    @param pId 放送 IS
+    @param pId 放送 ID
     """
     subtitleOffset(query: SubtitleQueryInput, pId: Int!): Int
 
@@ -32,8 +33,9 @@ type Query {
     @param query クエリ
     @param offset 検索の先頭からのオフセット
     @param limit 検索結果の最大取得件数
+    @param contextData 任意のコンテキストデータ
     """
-    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100): ProgramResult!
+    programs(query: ProgramQueryInput, offset: Int!, limit: Int! = 100, contextData: String = null): ProgramResult!
 
     """
     チャンネルを取得します
@@ -50,9 +52,21 @@ type Query {
     keywordGroups(query: KeywordGroupQueryInput): [KeywordGroup!]!
 
     """
+    ライブのバッファされている秒数を取得します
+
+    @param liveId ライブID
+    """
+    getLiveDuration(liveId: String!): Duration!
+
+    """
     ディスク情報を取得します
     """
     diskInfo: DiskInfo!
+
+    """
+    ジョブの進捗を0〜1の間で取得します
+    """
+    jobProgress(job: Job!): Float
 }
 
 "放送クエリ入力"
@@ -71,14 +85,23 @@ input SubtitleQueryInput {
     receivableStation: Boolean = true
 
     """
-    録画が存在する放送を取得する場合 true
-    録画が存在しない放送を取得する場合 false
+    動画ファイル種別のうち、いずれかの録画が存在する放送を取得する場合 true
+    いずれの種別の録画も存在しない放送を取得する場合 false
     両方の放送を取得する場合 null
+    videoTypes と同時に指定された場合の挙動は未定義です。
     """
     hasRecording: Boolean
 
     """
-    hasRecording=true の場合に、録画中の放送を「録画が存在する」とみなす場合 true
+    動画ファイル種別
+    指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+    空の配列が渡された場合および無指定の場合は、このフィルタは無視されます。
+    hasRecording と同時に指定された場合の挙動は未定義です。
+    """
+    videoTypes: [VideoType!]
+
+    """
+    hasRecording = true や videoTypes.isNotEmpty の場合に、録画中の放送を「録画が存在する」とみなす場合 true
     そうでない場合 false もしくは null
     """
     nowRecording: Boolean
@@ -91,6 +114,12 @@ input SubtitleQueryInput {
 
     "ソート方向"
     direction: Direction
+
+    """
+    ステータス
+    指定されたステータスを含む放送のみを取得します
+    """
+    fileStatuses: [FileStatus!]
 }
 
 "番組クエリ入力"
@@ -108,8 +137,17 @@ input ProgramQueryInput {
     録画が存在する番組を取得する場合 true
     録画が存在しない番組を取得する場合 false
     両方の番組を取得する場合 null
+    videoTypes と同時に指定された場合の挙動は未定義です。
     """
     hasRecording: Boolean
+
+    """
+    動画ファイル種別
+    指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+    空の配列が渡された場合および無指定の場合は、このフィルタは無視されます。
+    hasRecording と同時に指定された場合の挙動は未定義です。
+    """
+    videoTypes: [VideoType!]
 }
 
 "チャンネルクエリ入力"
@@ -120,6 +158,11 @@ input StationQueryInput {
     すべてのチャンネルを取得する場合 null
     """
     receivableStation: Boolean = true
+
+    """
+    チャンネル種別
+    """
+    digitalStationBands: [DigitalStationBand!]
 }
 
 "キーワードグループクエリ入力"
@@ -128,8 +171,17 @@ input KeywordGroupQueryInput {
     録画が存在するキーワードグループを取得する場合 true
     録画が存在しないキーワードグループを取得する場合 false
     両方のキーワードグループを取得する場合 null
+    videoTypes と同時に指定された場合の挙動は未定義です。
     """
     hasRecording: Boolean
+
+    """
+    動画ファイル種別
+    指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+    空の配列が渡された場合および無指定の場合は、このフィルタは無視されます。
+    hasRecording と同時に指定された場合の挙動は未定義です。
+    """
+    videoTypes: [VideoType!]
 
     "キーワード (部分一致)"
     keywordContains: String

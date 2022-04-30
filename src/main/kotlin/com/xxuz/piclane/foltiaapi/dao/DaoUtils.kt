@@ -46,3 +46,6 @@ fun OffsetDateTime?.toTimestamp(): Optional<Timestamp> {
 
 fun Long.toLocalDateTime(): LocalDateTime =
         LocalDateTime.parse(this.toString(10), simpleDateTimeFormatter)
+
+fun LocalDateTime.toLong(): Long =
+        this.format(simpleDateTimeFormatter).toLong(10)

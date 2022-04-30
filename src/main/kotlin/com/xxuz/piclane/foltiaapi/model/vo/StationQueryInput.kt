@@ -1,5 +1,7 @@
 package com.xxuz.piclane.foltiaapi.model.vo
 
+import com.xxuz.piclane.foltiaapi.model.Station
+
 /**
  * チャンネルクエリ入力
  */
@@ -10,4 +12,9 @@ data class StationQueryInput(
      * すべてのチャンネルを取得する場合 null
      */
     val receivableStation: Boolean?,
+
+    /**
+     * チャンネル種別
+     */
+    val digitalStationBands: Set<Station.DigitalStationBand>?,
 )

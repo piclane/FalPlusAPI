@@ -25,6 +25,8 @@ class FoltiaConfiguration(
             phpToolPath = result["phptoolpath"]?.let { File(it) } ?: throw IllegalStateException("The phptoolpath configuration is missing."),
             recFolderPath = result["recfolderpath"]?.let { File(it) } ?: throw IllegalStateException("The recfolderpath configuration is missing."),
             httpMediaMapPath = result["httpmediamappath"]?.let { URI(slashEnd(it)) } ?: throw IllegalStateException("The httpmediamappath configuration is missing."),
+            liveBufferTime = result["livebuffertime"]?.toInt() ?: FoltiaConfig.defaultBufferTime,
+            chasingPlaybackBufferTime = result["chasingplaybackbuffertime"]?.toInt() ?: FoltiaConfig.defaultBufferTime,
             firmwareVersion = result["firmwareversion"] ?: "",
         )
     }

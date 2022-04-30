@@ -1,6 +1,7 @@
 type Mutation {
     """
     放送を更新します
+
     @param input 放送更新入力
     @return 更新された放送
     """
@@ -8,6 +9,7 @@ type Mutation {
 
     """
     放送の動画ファイルをアップロードします
+
     @param input 放送動画アップロード入力
     @param video 動画ファイル
     """
@@ -15,18 +17,62 @@ type Mutation {
 
     """
     放送の動画ファイルを削除します
+
     @param input 放送動画削除入力
     """
-    deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!): Void
+    deleteSubtitleVideo(input: [DeleteSubtitleVideoInput!]!, physical: Boolean! = false): Job!
+
+    """
+    クエリに一致した動画ファイルを削除します。
+    削除する動画ファイルの種別は SubtitleQueryInput.videoTypes で指定します。
+    SubtitleQueryInput.videoTypes の指定が無い又は空配列の場合、この処理は 0 を戻して即終了します。
+
+    @param input 放送クエリ入力
+    @param physical 物理削除の場合 true そうでない場合 false
+    @return 削除した動画ファイルの件数
+    """
+    deleteSubtitleVideoByQuery(input: SubtitleQueryInput!, physical: Boolean! = false): Job!
 
     """
     チャンネルを更新します
+
     @param input チャンネル更新入力
     """
     updateStation(input: StationUpdateInput): Station
 
     """
+    指定されたチャンネルのライブを開始します
+
+    @param stationId チャンネルID
+    @param liveQuality ライブ品質
+    """
+    startLive(stationId: Long!, liveQuality: LiveQuality!): LiveResult
+
+    """
+    ライブを停止します
+
+    @param liveId ライブID
+    """
+    stopLive(liveId: String!): Void
+
+    """
+    すべてのライブを停止します
+    """
+    stopLiveAll: Void
+
+    """
     トランスコードを開始します
     """
     startTranscode: Void
+}
+
+type LiveResult {
+    "ライブID"
+    liveId: String!
+
+    "m3u8 ファイルへの URI"
+    m3u8Uri: URI!
+
+    "推奨バッファ時間"
+    preferredBufferTime: Duration!
 }

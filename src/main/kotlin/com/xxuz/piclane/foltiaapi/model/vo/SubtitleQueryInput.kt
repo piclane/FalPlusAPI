@@ -2,6 +2,7 @@ package com.xxuz.piclane.foltiaapi.model.vo
 
 import com.xxuz.piclane.foltiaapi.model.Direction
 import com.xxuz.piclane.foltiaapi.model.Subtitle
+import com.xxuz.piclane.foltiaapi.model.VideoType
 
 /**
  * 放送クエリ入力
@@ -33,6 +34,14 @@ data class SubtitleQueryInput(
      */
     val nowRecording: Boolean?,
 
+    /**
+     * 動画ファイル種別
+     * 指定された動画ファイル種別の内、いずれかの種別が存在する場合に、その放送が一致するとみなされます。
+     * 空の Set が渡された場合および null の場合は、このフィルタは無視されます。
+     * hasRecording と同時に指定された場合の挙動は未定義です。
+     */
+    val videoTypes: Set<VideoType>?,
+
     /** キーワードグループID */
     val keywordGroupId: Long?,
 
@@ -41,4 +50,10 @@ data class SubtitleQueryInput(
 
     /** ソート方向 */
     val direction: Direction?,
+
+    /**
+     * ステータス
+     * 指定されたステータスを含む放送のみを取得します
+     */
+    val fileStatuses: Set<Subtitle.FileStatus>?,
 )

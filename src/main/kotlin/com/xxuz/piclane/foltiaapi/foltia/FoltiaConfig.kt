@@ -22,16 +22,28 @@ data class FoltiaConfig(
     /** HTTP メディアへのパス */
     val httpMediaMapPath: URI,
 
+    /** ライブのバッファ時間 (秒) */
+    val liveBufferTime: Int,
+
+    /** 追いかけ再生の場合のバッファ時間 (秒) */
+    val chasingPlaybackBufferTime: Int,
+
     /** バージョン */
     val firmwareVersion: String,
 ) {
+    /**
+     * ライブディレクトリへのパスを取得します
+     */
+    val livePath: File
+        get() = recFolderPath.resolve("live")
+
     /** perl ファイルを取得します */
     fun perlPath(pl: String): File =
-        File(this.perlToolPath, "perl${File.pathSeparator}${pl}")
+        File(this.perlToolPath, "perl${File.separator}${pl}")
 
     /** php ファイルを取得します */
     fun phpPath(php: String): File =
-        File(this.phpToolPath, "php${File.pathSeparator}${php}")
+        File(this.phpToolPath, "php${File.separator}${php}")
 
     /**
      * 番組ディレクトリへのパスを取得します
@@ -168,5 +180,8 @@ data class FoltiaConfig(
 
     companion object {
         private val regexM2t = Regex("""^(.+)\.m2t$""", RegexOption.IGNORE_CASE)
+
+        /** デフォルトのバッファ時間 (秒) */
+        const val defaultBufferTime = 30;
     }
 }

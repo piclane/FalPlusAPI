@@ -1,6 +1,7 @@
 package com.xxuz.piclane.foltiaapi.dao
 
 import com.xxuz.piclane.foltiaapi.model.Program
+import com.xxuz.piclane.foltiaapi.model.VideoType
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramQueryInput
 import com.xxuz.piclane.foltiaapi.model.vo.ProgramResult
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +12,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -54,8 +54,9 @@ class ProgramDao(
      * @param query クエリ
      * @param offset 検索の先頭からのオフセット
      * @param limit 検索結果の最大取得件数
+     * @param contextData 任意のコンテキストデータ
      */
-    fun find(query: ProgramQueryInput?, offset: Int, limit: Int): ProgramResult {
+    fun find(query: ProgramQueryInput?, offset: Int, limit: Int, contextData: String? = null): ProgramResult {
         val conditions = mutableListOf<String>(
             "tid NOT IN (:tIdKeyword, :tIdEpg)"
         )
@@ -104,6 +105,22 @@ class ProgramDao(
                 )
             )""".trimIndent())
         }
+        if(query?.videoTypes?.isNotEmpty() == true) {
+            mutableListOf<String>()
+                .also {
+                    if(query.videoTypes.contains(VideoType.TS)) it.add("(S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename))")
+                    if(query.videoTypes.contains(VideoType.SD)) it.add("(S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename))")
+                    if(query.videoTypes.contains(VideoType.HD)) it.add("(S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))")
+                }
+                .joinToString(" OR ")
+                .also {
+                    conditions.add("""EXISTS(
+                        SELECT 1
+                        FROM foltia_subtitle AS S 
+                        WHERE S.tid = P.tid AND (${it})
+                    )""".trimIndent())
+                }
+        }
 
         val where = if(conditions.isEmpty()) "" else "WHERE ${conditions.joinToString(" AND ")}"
         val data =  jt.query(
@@ -132,7 +149,7 @@ class ProgramDao(
             Int::class.java
         )
 
-        return ProgramResult(offset, limit, total ?: 0, data)
+        return ProgramResult(offset, limit, contextData, total ?: 0, data)
     }
 
     /**

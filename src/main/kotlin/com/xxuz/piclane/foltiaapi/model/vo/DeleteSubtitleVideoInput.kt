@@ -11,7 +11,4 @@ data class DeleteSubtitleVideoInput(
 
     /** 動画ファイルの種別 */
     val videoTypes: Set<VideoType>,
-
-    /** 物理削除の場合 true そうでない場合 false */
-    val physical: Boolean,
 )

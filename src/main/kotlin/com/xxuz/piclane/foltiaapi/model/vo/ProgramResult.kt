@@ -12,6 +12,9 @@ data class ProgramResult(
     /** 検索結果の最大取得件数  */
     val limit: Int,
 
+    /** 任意のコンテキストデータ */
+    val contextData: String?,
+
     /** 総行数 */
     val total: Int,
 

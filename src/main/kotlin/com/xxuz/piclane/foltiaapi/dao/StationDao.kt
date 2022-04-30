@@ -60,6 +60,10 @@ class StationDao(
             conditions.add("receiving = :receiving")
             params["receiving"] = if(query.receivableStation) 1 else 0
         }
+        if(query?.digitalStationBands != null && query.digitalStationBands.isNotEmpty()) {
+            val options =  query.digitalStationBands.map { it.code }.joinToString(", ")
+            conditions.add("digitalstationband IN (${options})")
+        }
 
         val data = jt.query(
             """
@@ -143,31 +147,31 @@ class StationDao(
      */
     private object RowMapperImpl : RowMapper<Station> {
         override fun mapRow(rs: ResultSet, rowNum: Int): Station =
-                Station(
-                        stationId = rs.getLong("stationid"),
-                        stationName = rs.getString("stationname"),
+            Station(
+                stationId = rs.getLong("stationid"),
+                stationName = rs.getString("stationname"),
 //                        stationRecCh = rs.getLong("stationrecch"),
-                        stationCallSign = rs.getString("stationcallsign"),
-                        stationUri = rs.getString("stationuri"),
+                stationCallSign = rs.getString("stationcallsign"),
+                stationUri = rs.getString("stationuri"),
 //                        tunerType = rs.getString("tunertype"),
 //                        tunerCh = rs.getString("tunerch"),
 //                        device = rs.getString("device"),
-                        ontvcode = rs.getString("ontvcode"),
-                        digitalCh = rs.getLong("digitalch").let { if (rs.wasNull()) null else it },
-                        digitalStationBand = rs.getInt("digitalstationband").let {
-                            if (rs.wasNull())
-                                null
-                            else
-                                Station.DigitalStationBand.codeOf(it).orElseThrow()
-                        },
-                        epgName = rs.getString("epgname")?.trim(),
-                        receiving = rs.getLong("receiving") == 1L,
-                        cmEditDetectThreshold = rs.getInt("cmeditdetectthreshold").let {
-                            if (rs.wasNull())
-                                CmEdit.DetectThreshold.OFF
-                            else
-                                CmEdit.DetectThreshold.codeOf(it)
-                        },
-                )
+                ontvcode = rs.getString("ontvcode"),
+                digitalCh = rs.getLong("digitalch").let { if (rs.wasNull()) null else it },
+                digitalStationBand = rs.getInt("digitalstationband").let {
+                    if (rs.wasNull())
+                        null
+                    else
+                        Station.DigitalStationBand.codeOf(it).orElseThrow()
+                },
+                epgName = rs.getString("epgname")?.trim(),
+                receiving = rs.getLong("receiving") == 1L,
+                cmEditDetectThreshold = rs.getInt("cmeditdetectthreshold").let {
+                    if (rs.wasNull())
+                        CmEdit.DetectThreshold.OFF
+                    else
+                        CmEdit.DetectThreshold.codeOf(it)
+                },
+            )
     }
 }
