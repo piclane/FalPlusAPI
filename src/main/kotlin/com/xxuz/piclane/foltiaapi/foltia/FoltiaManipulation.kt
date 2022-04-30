@@ -20,6 +20,7 @@ import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.file.Files
 import java.time.Duration
 import java.time.format.DateTimeFormatter
@@ -116,29 +117,69 @@ class FoltiaManipulation(
      * 放送の動画を削除します
      */
     fun deleteSubtitleVideo(target: DeleteSubtitleVideoInput, physical: Boolean) {
-        if(physical)
-            deleteSubtitleVideoPhysically(target)
-        else
-            deleteSubtitleVideoLogically(target)
+        try {
+            if (physical)
+                deleteSubtitleVideoPhysically(target)
+            else
+                deleteSubtitleVideoLogically(target)
+
+            logger.info("[deleteSubtitleVideo] Deleted: pId=${target.pId}, videoTypes=${target.videoTypes.joinToString(",")}")
+        } catch(e: DeleteVideoFailedException) {
+            logger.error("[deleteSubtitleVideo] ${e.message}", e)
+        }
     }
 
     /**
      * 放送の動画を論理削除します
      */
     private fun deleteSubtitleVideoLogically(target: DeleteSubtitleVideoInput) {
-        val subtitle = subtitleDao.get(target.pId) ?: return
-        val deleteMoviePl = config.perlPath("deletemovie.pl")
-        target.videoTypes.forEach { videoType ->
-            val filename = subtitle.videoFilename(videoType)
-            ProcessBuilder()
-                .directory(config.perlToolPath)
-                .command(deleteMoviePl.absolutePath, filename)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .start()
-                .pipeLog("[deleteSubtitleVideoLogically] ", logger)
-                .waitFor()
+        val tx = TransactionTemplate(txMgr)
+        val txStatus = txMgr.getTransaction(tx)
+        val mitaPath = config.recFolderPath.toPath().resolve("mita")
+
+        // DB から動画を削除
+        val (oldSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
+
+        // TS 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.TS)) {
+            config.tsVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.move(file.toPath(), mitaPath.resolve(file.name))
+                    runMakeDlnaStructure(file.name, "EXCHANGE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.TS, file, e)
+                }
+            }
         }
+
+        // SD 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.SD)) {
+            config.sdVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.move(file.toPath(), mitaPath.resolve(file.name))
+                    runMakeDlnaStructure(file.name, "EXCHANGE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.SD, file, e)
+                }
+            }
+        }
+
+        // HD 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.HD)) {
+            config.hdVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.move(file.toPath(), mitaPath.resolve(file.name))
+                    runMakeDlnaStructure(file.name, "EXCHANGE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.HD, file, e)
+                }
+            }
+        }
+
+        txMgr.commit(txStatus)
     }
 
     /**
@@ -151,9 +192,74 @@ class FoltiaManipulation(
         // DB から動画を削除
         val (oldSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
 
-        // 動画ファイルを削除
-        if(config.tsVideoPath(oldSubtitle)?.delete() != true) {
-            txMgr.rollback(txStatus)
+        // TS 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.TS)) {
+            config.tsVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.deleteIfExists(file.toPath())
+                    runMakeDlnaStructure(file.name, "DELETE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.TS, file, e)
+                }
+            }
+        }
+
+        // SD 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.SD)) {
+            config.sdVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.deleteIfExists(file.toPath())
+                    runMakeDlnaStructure(file.name, "DELETE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.SD, file, e)
+                }
+            }
+        }
+
+        // HD 動画ファイルを削除
+        if(target.videoTypes.contains(VideoType.HD)) {
+            config.hdVideoPath(oldSubtitle)?.also { file ->
+                try {
+                    Files.deleteIfExists(file.toPath())
+                    runMakeDlnaStructure(file.name, "DELETE")
+                } catch(e: IOException) {
+                    txMgr.rollback(txStatus)
+                    throw DeleteVideoFailedException(target.pId, VideoType.HD, file, e)
+                }
+            }
+        }
+
+        txMgr.commit(txStatus)
+    }
+
+    /**
+     * makedlnastructure.pl を呼び出します
+     *
+     * @param filename ファイル名
+     * @param command 以下のいずれかのコマンド
+     * - REBUILD: 全体のリビルド (未対応)
+     * - DELETE: 指定ファイルの削除
+     * - EXCHANGE: 指定ファイルの再作成
+     * - (null): 指定ファイルの作成
+     */
+    private fun runMakeDlnaStructure(filename: String, command: String?) {
+        val makeDlnaStructurePath = config.perlPath("makedlnastructure.pl")
+        val args = mutableListOf(makeDlnaStructurePath.absolutePath, filename)
+        if(command != null) {
+            args.add(command)
+        }
+        val exitCode = ProcessBuilder()
+            .directory(config.perlToolPath)
+            .command(args)
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .start()
+            .pipeLog("[runMakeDlnaStructure] ", logger)
+            .waitFor()
+        if(exitCode != 0) {
+            throw IOException("runMakeDlnaStructure Failed: makedlnastructure.pl $filename $command")
         }
     }
 
