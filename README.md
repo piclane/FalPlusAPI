@@ -1,6 +1,6 @@
-FoltiaApi
+FalPlusAPI
 ----
-Foltia AnimeLocker 用の GraphQL API です。
+[Foltia ANIME LOCKER](https://foltia.com/ANILOC/) 用の GraphQL API です。
 
 ## 提供機能
 
@@ -37,7 +37,7 @@ Foltia AnimeLocker 用の GraphQL API です。
 
 ### 購読 (subscription)
 
-未使用 (AnimeLocker が httpd v2.2 なので、このまま使わないかも)
+未使用 (ANIME LOCKER が httpd v2.2 なので、このまま使わないかも)
 
 ### 認証・認可
 
@@ -113,9 +113,9 @@ http://<hostname>/api/graphql
 
 ### インストール
 
-Foltia AnimeLocker に foltia ユーザーでログインした後、以下のコマンドを実行して下さい。
+Foltia ANIME LOCKER に foltia ユーザーでログインした後、以下のコマンドを実行して下さい。
 ```bash
-$ curl -L -o /tmp/fapi.tar.gz "$(curl -sS -H 'Accept: application/vnd.github.v3+json' 'https://api.github.com/repos/piclane/FoltiaApi/releases/latest' | grep '"browser_download_url"' | sed -E -e 's/^.*"(https:[^"]+)"$/\1/')"
+$ curl -L -o /tmp/fapi.tar.gz "$(curl -sS -H 'Accept: application/vnd.github.v3+json' 'https://api.github.com/repos/piclane/FalPlusAPI/releases/latest' | grep '"browser_download_url"' | sed -E -e 's/^.*"(https:[^"]+)"$/\1/')"
 $ cd /tmp
 $ tar zxf fapi.tar.gz
 $ rm fapi.tar.gz
@@ -125,7 +125,7 @@ $ su -c "$(pwd)/install.sh" -
 
 ### アンインストール
 
-Foltia AnimeLocker に foltia ユーザーでログインした後、以下のコマンドを実行して下さい。
+Foltia ANIME LOCKER に foltia ユーザーでログインした後、以下のコマンドを実行して下さい。
 ```bash
 $ cd /tmp/foltia_api-<version>
 $ su -c "$(pwd)/uninstall.sh" -
