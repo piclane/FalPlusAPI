@@ -99,8 +99,8 @@ tasks.register("package") {
     doLast {
         ant.withGroovyBuilder {
             val zipBaseDir = "${buildDir}/package"
-            val zipDir = "${zipBaseDir}/foltia_api-${project.version}"
-            val artifactPath = "${buildDir}/foltia_api-${project.version}-linux-amd64.tar.gz"
+            val zipDir = "${zipBaseDir}/fal-plus-api-${project.version}"
+            val artifactPath = "${buildDir}/fal-plus-api-${project.version}-linux-amd64.tar.gz"
 
             // zipBaseDir をクリア
             "delete"("dir" to zipBaseDir, "quiet" to true)

@@ -1,1 +1,1 @@
-rootProject.name = "foltiaApi"
+rootProject.name = "FalPlusAPI"
