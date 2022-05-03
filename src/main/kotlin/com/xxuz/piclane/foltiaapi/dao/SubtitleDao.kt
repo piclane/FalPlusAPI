@@ -257,6 +257,9 @@ class SubtitleDao(
             """,
             params
         )
+
+        // キャッシュの削除
+        cacheMgr.getCache("foltia")?.evictIfPresent("subtitle:pId=${input.pId}")
     }
 
     /**

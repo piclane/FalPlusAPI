@@ -6,6 +6,7 @@ import com.xxuz.piclane.foltiaapi.model.vo.StationQueryInput
 import com.xxuz.piclane.foltiaapi.model.vo.StationResult
 import com.xxuz.piclane.foltiaapi.model.vo.StationUpdateInput
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.core.RowMapper
@@ -18,8 +19,11 @@ import java.sql.ResultSet
  */
 @Repository
 class StationDao(
-        @Autowired
-        private val jt: NamedParameterJdbcTemplate
+    @Autowired
+    private val jt: NamedParameterJdbcTemplate,
+
+    @Autowired
+    private val cacheMgr: CacheManager,
 ) {
     /**
      * ID からチャンネルを取得します
@@ -140,6 +144,9 @@ class StationDao(
             """,
             params
         )
+
+        // キャッシュの削除
+        cacheMgr.getCache("foltia")?.evictIfPresent("station:stationId=${input.stationId}")
     }
 
     /**
