@@ -239,11 +239,11 @@ class SubtitleDao(
         }
         if(input.fileStatusDefined && input.fileStatus != null) {
             sets.add("filestatus = :fileStatus")
-            params["fileStatus"] = input.fileStatus
+            params["fileStatus"] = input.fileStatus.code
         }
         if(input.encodeSettingDefined && input.encodeSetting != null) {
             sets.add("encodesetting = :encodeSetting")
-            params["encodeSetting"] = input.encodeSetting
+            params["encodeSetting"] = input.encodeSetting.code
         }
 
         jt.update(
