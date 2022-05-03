@@ -38,7 +38,7 @@ type Mutation {
 
     @param input チャンネル更新入力
     """
-    updateStation(input: StationUpdateInput): Station
+    updateStation(input: StationUpdateInput!): Station
 
     """
     指定されたチャンネルのライブを開始します
