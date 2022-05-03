@@ -12,7 +12,9 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 
-@SpringBootApplication
+@SpringBootApplication(
+    scanBasePackages = ["org.springframework.cache"]
+)
 @EnableCaching
 @ConfigurationPropertiesScan
 class MainApplication {
