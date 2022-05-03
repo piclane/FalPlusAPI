@@ -1,5 +1,6 @@
 package com.xxuz.piclane.foltiaapi.model.vo
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder
 import com.xxuz.piclane.foltiaapi.model.Subtitle
@@ -27,7 +28,8 @@ data class SubtitleUpdateInput(
 ) {
     @JsonPOJOBuilder(withPrefix = "set")
     class Builder {
-        /** プライマリキー */
+        /** 放送ID */
+        @JsonProperty("pId")
         var pId: Long? = null
 
         /** サブタイトル */
