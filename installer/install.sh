@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)
 
@@ -7,12 +7,14 @@ service fapi stop || true
 
 # install java 11
 if ! java -version 2>&1 | grep -q -F '"11.' ; then
+  echo "Java11 のインストールを行います"
   curl -L -# -o '/tmp/amazon-corretto-11-x64-linux-jdk.rpm' 'https://corretto.aws/downloads/latest/amazon-corretto-11-x64-linux-jdk.rpm'
   yum localinstall -y '/tmp/amazon-corretto-11-x64-linux-jdk.rpm'
   rm -f '/tmp/amazon-corretto-11-x64-linux-jdk.rpm'
 fi
 
 # install app jar
+echo "FalPlusAPI のインストールを行います"
 mkdir -p /usr/local/fapi
 \rm -f /usr/local/fapi/*.jar
 cp "${SCRIPT_DIR}"/*.jar /usr/local/fapi/
@@ -34,3 +36,5 @@ service fapi start
 
 # reload httpd service
 service httpd reload
+
+echo "FalPlusAPI のインストールが完了しました"
