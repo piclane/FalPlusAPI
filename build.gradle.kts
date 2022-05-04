@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.xxuz.piclane"
-version = "1.0.6"
+version = "1.0.7"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -45,7 +45,6 @@ dependencies {
 
     // Cache
     runtimeOnly("com.github.ben-manes.caffeine:caffeine")
-    runtimeOnly("javax.cache:cache-api:1.1.1")
 
     // JDBC
     runtimeOnly("org.postgresql:postgresql:42.3.4")

@@ -119,7 +119,7 @@ $ curl -L -o /tmp/fapi.tar.gz "$(curl -sS -H 'Accept: application/vnd.github.v3+
 $ cd /tmp
 $ tar zxf fapi.tar.gz
 $ rm fapi.tar.gz
-$ cd foltia_api-<version>
+$ cd fal-plus-api-<version>
 $ su -c "$(pwd)/install.sh" -
 ```
 
@@ -127,6 +127,6 @@ $ su -c "$(pwd)/install.sh" -
 
 Foltia ANIME LOCKER に foltia ユーザーでログインした後、以下のコマンドを実行して下さい。
 ```bash
-$ cd /tmp/foltia_api-<version>
+$ cd /tmp/fal-plus-api-<version>
 $ su -c "$(pwd)/uninstall.sh" -
 ```
