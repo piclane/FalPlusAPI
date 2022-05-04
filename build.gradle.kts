@@ -31,7 +31,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -44,6 +43,9 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.13.2.2")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.13.2")
 
+    // Cache
+    runtimeOnly("com.github.ben-manes.caffeine:caffeine")
+    runtimeOnly("javax.cache:cache-api:1.1.1")
 
     // JDBC
     runtimeOnly("org.postgresql:postgresql:42.3.4")
