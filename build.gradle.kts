@@ -45,7 +45,6 @@ dependencies {
 
     // Cache
     runtimeOnly("com.github.ben-manes.caffeine:caffeine")
-    runtimeOnly("javax.cache:cache-api:1.1.1")
 
     // JDBC
     runtimeOnly("org.postgresql:postgresql:42.3.4")
