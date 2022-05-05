@@ -153,7 +153,7 @@ input SubtitleUpdateInput {
 "放送動画削除入力"
 input DeleteSubtitleVideoInput {
     "放送ID"
-    pId: Int
+    pId: Int!
 
     "動画ファイルの種別"
     videoTypes: [VideoType!]!
@@ -162,7 +162,7 @@ input DeleteSubtitleVideoInput {
 "放送動画アップロード入力"
 input UploadSubtitleVideoInput {
     "放送ID"
-    pId: Int
+    pId: Int!
 
     "動画ファイルの種別"
     videoType: VideoType!

@@ -22,6 +22,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
@@ -33,6 +34,9 @@ import kotlin.streams.asSequence
 class FoltiaManipulation(
     @Autowired
     private val config: FoltiaConfig,
+
+    @Autowired
+    private val makeDlnaStructure: MakeDlnaStructure,
 
     @Autowired
     private val subtitleDao: SubtitleDao,
@@ -117,151 +121,79 @@ class FoltiaManipulation(
      * 放送の動画を削除します
      */
     fun deleteSubtitleVideo(target: DeleteSubtitleVideoInput, physical: Boolean) {
-        try {
-            if (physical)
-                deleteSubtitleVideoPhysically(target)
-            else
-                deleteSubtitleVideoLogically(target)
-
-            logger.info("[deleteSubtitleVideo] Deleted: pId=${target.pId}, videoTypes=${target.videoTypes.joinToString(",")}")
-        } catch(e: DeleteVideoFailedException) {
-            logger.error("[deleteSubtitleVideo] ${e.message}", e)
-        }
-    }
-
-    /**
-     * 放送の動画を論理削除します
-     */
-    private fun deleteSubtitleVideoLogically(target: DeleteSubtitleVideoInput) {
         val tx = TransactionTemplate(txMgr)
         val txStatus = txMgr.getTransaction(tx)
         val mitaPath = config.recFolderPath.toPath().resolve("mita")
+        val moved = mutableListOf<VideoMovementResult>()
+        val rollback = {
+            moved.forEach { result ->
+                try {
+                    Files.move(result.dst, result.src)
+                    makeDlnaStructure.process(result.src.toFile())
+                    logger.info("[deleteSubtitleVideo] Rollback success: pId=${target.pId}, videoType=${result.videoType}, src=${result.dst}, dst=${result.src}")
+                } catch (e: IOException) {
+                    logger.error("[deleteSubtitleVideo] Rollback failed: pId=${target.pId}, videoType=${result.videoType}, src=${result.dst}, dst=${result.src}", e)
+                }
+            }
+        }
 
         // DB から動画を削除
         val (oldSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
 
-        // TS 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.TS)) {
-            config.tsVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.move(file.toPath(), mitaPath.resolve(file.name))
-                    runMakeDlnaStructure(file.name, "EXCHANGE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.TS, file, e)
+        // ファイルを mita に移動
+        target.videoTypes.forEach { videoType ->
+            val file = config.videoPath(oldSubtitle, videoType) ?: return@forEach
+            val src = file.toPath()
+            val dst = mitaPath.resolve(file.name)
+            try {
+                Files.move(src, dst)
+                makeDlnaStructure.delete(file)
+                moved.add(VideoMovementResult(src, dst, videoType))
+                if(!physical) {
+                    logger.info("[deleteSubtitleVideo] Moved: pId=${target.pId}, videoType=${videoType}, src=${src}, dst=${dst}")
                 }
+            } catch(e: IOException) {
+                logger.error("[deleteSubtitleVideo] Failed to move file: pId=${target.pId}, videoType=${videoType}, src=${src}, dst=${dst}", e)
+                txMgr.rollback(txStatus)
+                rollback()
+                throw DeleteVideoFailedException(target.pId, videoType, file, e)
             }
         }
 
-        // SD 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.SD)) {
-            config.sdVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.move(file.toPath(), mitaPath.resolve(file.name))
-                    runMakeDlnaStructure(file.name, "EXCHANGE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.SD, file, e)
-                }
-            }
-        }
-
-        // HD 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.HD)) {
-            config.hdVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.move(file.toPath(), mitaPath.resolve(file.name))
-                    runMakeDlnaStructure(file.name, "EXCHANGE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.HD, file, e)
-                }
-            }
-        }
-
+        // トランザクションをコミット
         txMgr.commit(txStatus)
+
+        // ファイルを物理削除
+        if(physical) {
+            val itr = moved.iterator()
+            while (itr.hasNext()) {
+                val result = itr.next()
+                try {
+                    Files.deleteIfExists(result.dst)
+                    itr.remove()
+                    logger.info("[deleteSubtitleVideo] Deleted: pId=${target.pId}, videoType=${result.videoType}, path=${result.src}")
+                } catch (e: IOException) {
+                    logger.error("[deleteSubtitleVideo] Failed to delete file: pId=${target.pId}, videoType=${result.videoType}, path=${result.dst}", e)
+                    rollback()
+                    throw DeleteVideoFailedException(target.pId, result.videoType, result.src.toFile(), e)
+                }
+            }
+        }
     }
 
     /**
-     * 放送の動画を物理削除します
+     * 動画ファイル移動実績
      */
-    private fun deleteSubtitleVideoPhysically(target: DeleteSubtitleVideoInput) {
-        val tx = TransactionTemplate(txMgr)
-        val txStatus = txMgr.getTransaction(tx)
+    private data class VideoMovementResult(
+        /** 移動元 */
+        val src: Path,
 
-        // DB から動画を削除
-        val (oldSubtitle) = subtitleDao.deleteVideo(target.pId, target.videoTypes) ?: return
+        /** 移動先 */
+        val dst: Path,
 
-        // TS 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.TS)) {
-            config.tsVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.deleteIfExists(file.toPath())
-                    runMakeDlnaStructure(file.name, "DELETE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.TS, file, e)
-                }
-            }
-        }
-
-        // SD 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.SD)) {
-            config.sdVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.deleteIfExists(file.toPath())
-                    runMakeDlnaStructure(file.name, "DELETE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.SD, file, e)
-                }
-            }
-        }
-
-        // HD 動画ファイルを削除
-        if(target.videoTypes.contains(VideoType.HD)) {
-            config.hdVideoPath(oldSubtitle)?.also { file ->
-                try {
-                    Files.deleteIfExists(file.toPath())
-                    runMakeDlnaStructure(file.name, "DELETE")
-                } catch(e: IOException) {
-                    txMgr.rollback(txStatus)
-                    throw DeleteVideoFailedException(target.pId, VideoType.HD, file, e)
-                }
-            }
-        }
-
-        txMgr.commit(txStatus)
-    }
-
-    /**
-     * makedlnastructure.pl を呼び出します
-     *
-     * @param filename ファイル名
-     * @param command 以下のいずれかのコマンド
-     * - REBUILD: 全体のリビルド (未対応)
-     * - DELETE: 指定ファイルの削除
-     * - EXCHANGE: 指定ファイルの再作成
-     * - (null): 指定ファイルの作成
-     */
-    private fun runMakeDlnaStructure(filename: String, command: String?) {
-        val makeDlnaStructurePath = config.perlPath("makedlnastructure.pl")
-        val args = mutableListOf(makeDlnaStructurePath.absolutePath, filename)
-        if(command != null) {
-            args.add(command)
-        }
-        val exitCode = ProcessBuilder()
-            .directory(config.perlToolPath)
-            .command(args)
-            .redirectError(ProcessBuilder.Redirect.PIPE)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-            .start()
-            .pipeLog("[runMakeDlnaStructure] ", logger)
-            .waitFor()
-        if(exitCode != 0) {
-            throw IOException("runMakeDlnaStructure Failed: makedlnastructure.pl $filename $command")
-        }
-    }
+        /** 動画種別 */
+        val videoType: VideoType,
+    )
 
     /**
      * dropInfo を取得します
