@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.xxuz.piclane"
-version = "1.0.7"
+version = "1.0.8"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
