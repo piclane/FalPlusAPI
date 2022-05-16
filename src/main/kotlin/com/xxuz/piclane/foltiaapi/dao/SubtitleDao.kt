@@ -37,11 +37,20 @@ class SubtitleDao(
                 """
                 SELECT
                     S.*,
-                    N.recfilename
+                    N.recfilename,
+                    CASE WHEN TSF.m2pfilename IS NULL THEN 0 ELSE 1 END AS EXISTS_TS,
+                    CASE WHEN SDF.mp4filename IS NULL THEN 0 ELSE 1 END AS EXISTS_SD,
+                    CASE WHEN HDF.hdmp4filename IS NULL THEN 0 ELSE 1 END AS EXISTS_HD
                 FROM
                     foltia_subtitle AS S
                 LEFT OUTER JOIN 
                     foltia_nowrecording AS N ON S.pid = N.pid
+                LEFT OUTER JOIN
+                    foltia_m2pfiles AS TSF ON S.m2pfilename = TSF.m2pfilename
+                LEFT OUTER JOIN
+                    foltia_mp4files AS SDF ON S.pspfilename = SDF.mp4filename
+                LEFT OUTER JOIN
+                    foltia_hdmp4files AS HDF ON S.mp4hd = HDF.hdmp4filename
                 WHERE
                     S.pid = :pId
                 """,
@@ -73,7 +82,10 @@ class SubtitleDao(
             """
             SELECT
                 S.*,
-                N.recfilename
+                N.recfilename,
+                CASE WHEN TSF.m2pfilename IS NULL THEN 0 ELSE 1 END AS EXISTS_TS,
+                CASE WHEN SDF.mp4filename IS NULL THEN 0 ELSE 1 END AS EXISTS_SD,
+                CASE WHEN HDF.hdmp4filename IS NULL THEN 0 ELSE 1 END AS EXISTS_HD
             FROM
                 foltia_subtitle AS S
             INNER JOIN
@@ -82,6 +94,12 @@ class SubtitleDao(
                 foltia_station AS ST ON S.stationid = ST.stationid
             LEFT OUTER JOIN 
                 foltia_nowrecording AS N ON S.pid = N.pid
+            LEFT OUTER JOIN
+                foltia_m2pfiles AS TSF ON S.m2pfilename = TSF.m2pfilename
+            LEFT OUTER JOIN
+                foltia_mp4files AS SDF ON S.pspfilename = SDF.mp4filename
+            LEFT OUTER JOIN
+                foltia_hdmp4files AS HDF ON S.mp4hd = HDF.hdmp4filename
             $where
             ORDER BY startdatetime $direction
             LIMIT :limit
@@ -102,6 +120,12 @@ class SubtitleDao(
                 foltia_station AS ST ON S.stationid = ST.stationid
             LEFT OUTER JOIN 
                 foltia_nowrecording AS N ON S.pid = N.pid
+            LEFT OUTER JOIN
+                foltia_m2pfiles AS TSF ON S.m2pfilename = TSF.m2pfilename
+            LEFT OUTER JOIN
+                foltia_mp4files AS SDF ON S.pspfilename = SDF.mp4filename
+            LEFT OUTER JOIN
+                foltia_hdmp4files AS HDF ON S.mp4hd = HDF.hdmp4filename
             $where
             """,
             params,
@@ -140,6 +164,12 @@ class SubtitleDao(
                         foltia_station AS ST ON S.stationid = ST.stationid
                     LEFT OUTER JOIN 
                         foltia_nowrecording AS N ON S.pid = N.pid
+                    LEFT OUTER JOIN
+                        foltia_m2pfiles AS TSF ON S.m2pfilename = TSF.m2pfilename
+                    LEFT OUTER JOIN
+                        foltia_mp4files AS SDF ON S.pspfilename = SDF.mp4filename
+                    LEFT OUTER JOIN
+                        foltia_hdmp4files AS HDF ON S.mp4hd = HDF.hdmp4filename
                     $where) AS X
                 WHERE
                     X.pid = :pId
@@ -178,10 +208,10 @@ class SubtitleDao(
         }
         if(query?.hasRecording == true) {
             conditions.add("""(
-                ${if(query.nowRecording == true) "N.recfilename IS NOT NULL OR" else ""}
-                (S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename)) OR 
-                (S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename)) OR 
-                (S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))
+                ${if(query.nowRecording == true) "(N.recfilename IS NOT NULL) OR" else ""}
+                (TSF.m2pfilename IS NOT NULL) OR 
+                (SDF.mp4filename IS NOT NULL) OR 
+                (HDF.hdmp4filename IS NOT NULL)
             )""".trimIndent())
         } else if(query?.hasRecording == false) {
             conditions.add("(S.m2pfilename IS NULL AND S.pspfilename IS NULL AND S.mp4hd IS NULL)")
@@ -190,9 +220,9 @@ class SubtitleDao(
             mutableListOf<String>()
                 .also {
                     if(query.nowRecording == true) it.add("N.recfilename IS NOT NULL")
-                    if(query.videoTypes.contains(VideoType.TS)) it.add("(S.m2pfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_m2pfiles AS TS WHERE TS.m2pfilename = S.m2pfilename))")
-                    if(query.videoTypes.contains(VideoType.SD)) it.add("(S.pspfilename IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_mp4files AS SD WHERE SD.mp4filename = S.pspfilename))")
-                    if(query.videoTypes.contains(VideoType.HD)) it.add("(S.mp4hd IS NOT NULL AND EXISTS(SELECT 1 FROM foltia_hdmp4files AS HD WHERE HD.hdmp4filename = S.mp4hd))")
+                    if(query.videoTypes.contains(VideoType.TS)) it.add("TSF.m2pfilename IS NOT NULL")
+                    if(query.videoTypes.contains(VideoType.SD)) it.add("SDF.mp4filename IS NOT NULL")
+                    if(query.videoTypes.contains(VideoType.HD)) it.add("HDF.hdmp4filename IS NOT NULL")
                 }
                 .joinToString(" OR ", prefix = "(", postfix = ")")
                 .also {
@@ -338,7 +368,7 @@ class SubtitleDao(
         }
 
         // キャッシュの削除
-        cacheMgr.getCache("subtitle")?.evictIfPresent("subtitle:pId=$pId")
+        cacheMgr.getCache("foltia")?.evictIfPresent("subtitle:pId=$pId")
 
         return subtitle to (get(pId) ?: throw RuntimeException())
     }
@@ -369,6 +399,9 @@ class SubtitleDao(
     private object RowMapperImpl : RowMapper<Subtitle> {
         override fun mapRow(rs: ResultSet, rowNum: Int): Subtitle {
             val recFilename = rs.getString("recfilename")
+            val existsTs = rs.getInt("EXISTS_TS") == 1
+            val existsSd = rs.getInt("EXISTS_SD") == 1
+            val existsHd = rs.getInt("EXISTS_HD") == 1
             val isRecording = recFilename?.isNotBlank() ?: false
             return Subtitle(
                 pId = rs.getLong("pid"),
@@ -380,8 +413,8 @@ class SubtitleDao(
                 endDateTime = rs.getLong("enddatetime").toLocalDateTime(),
                 startOffset = rs.getLong("startoffset"),
                 lengthMin = rs.getLong("lengthmin"),
-                m2pFilename = if(isRecording) recFilename else rs.getString("m2pfilename"),
-                pspFilename = rs.getString("pspfilename"),
+                m2pFilename = if(isRecording) recFilename else if(existsTs) rs.getString("m2pfilename") else null,
+                pspFilename = if(existsSd) rs.getString("pspfilename") else null,
                 epgAddedBy = rs.getLong("epgaddedby").let { if (rs.wasNull()) null else it },
                 lastUpdate = rs.getTimestamp("lastupdate").toOffsetDateTime().orElse(null),
                 fileStatus = rs.getInt("filestatus").let {
@@ -399,7 +432,7 @@ class SubtitleDao(
                     else
                         Subtitle.TranscodeQuality.codeOf(it).orElseThrow()
                 },
-                mp4hd = rs.getString("mp4hd"),
+                mp4hd = if(existsHd) rs.getString("mp4hd") else null,
                 syobocalFlag = rs.getInt("syobocalflag").let {
                     if (rs.wasNull())
                         emptySet()

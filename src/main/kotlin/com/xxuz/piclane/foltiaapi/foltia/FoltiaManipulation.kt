@@ -23,6 +23,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
@@ -87,8 +88,8 @@ class FoltiaManipulation(
         val base = "${subtitle.tId}-${subtitle.countNo}-${dtfFilename.format(subtitle.startDateTime)}-${station.digitalCh}"
         return when(videoType) {
             VideoType.TS -> "$base.m2t"
-            VideoType.SD -> "MAQ-$base.mp4"
-            VideoType.HD -> "MAQ-$base.mp4"
+            VideoType.SD -> "MAQ-$base.MP4"
+            VideoType.HD -> "MAQ-$base.MP4"
         }
     }
 
@@ -146,7 +147,7 @@ class FoltiaManipulation(
             val src = file.toPath()
             val dst = mitaPath.resolve(file.name)
             try {
-                Files.move(src, dst)
+                Files.move(src, dst, StandardCopyOption.REPLACE_EXISTING)
                 makeDlnaStructure.delete(file)
                 moved.add(VideoMovementResult(src, dst, videoType))
                 if(!physical) {

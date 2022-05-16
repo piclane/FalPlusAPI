@@ -26,6 +26,9 @@ tar zxf fapi.tar.gz
 cd "fal-plus-api-${VERSION}"
 
 title インストールを開始します...
+if [ "$(whoami)" != "root" ] ; then
+  echo "root ユーザーのパスワードを入力してください:"
+fi
 if ! su -c "$(pwd)/install.sh" - ; then
   echo
   echo 自動インストールに失敗しました。
