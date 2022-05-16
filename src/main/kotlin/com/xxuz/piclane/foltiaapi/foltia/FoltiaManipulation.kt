@@ -23,6 +23,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
@@ -146,7 +147,7 @@ class FoltiaManipulation(
             val src = file.toPath()
             val dst = mitaPath.resolve(file.name)
             try {
-                Files.move(src, dst)
+                Files.move(src, dst, StandardCopyOption.REPLACE_EXISTING)
                 makeDlnaStructure.delete(file)
                 moved.add(VideoMovementResult(src, dst, videoType))
                 if(!physical) {
