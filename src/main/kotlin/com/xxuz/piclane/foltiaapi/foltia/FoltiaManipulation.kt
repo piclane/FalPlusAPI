@@ -88,8 +88,8 @@ class FoltiaManipulation(
         val base = "${subtitle.tId}-${subtitle.countNo}-${dtfFilename.format(subtitle.startDateTime)}-${station.digitalCh}"
         return when(videoType) {
             VideoType.TS -> "$base.m2t"
-            VideoType.SD -> "MAQ-$base.mp4"
-            VideoType.HD -> "MAQ-$base.mp4"
+            VideoType.SD -> "MAQ-$base.MP4"
+            VideoType.HD -> "MAQ-$base.MP4"
         }
     }
 
