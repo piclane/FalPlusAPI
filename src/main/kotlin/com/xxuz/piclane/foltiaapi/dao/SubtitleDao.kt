@@ -368,7 +368,7 @@ class SubtitleDao(
         }
 
         // キャッシュの削除
-        cacheMgr.getCache("subtitle")?.evictIfPresent("subtitle:pId=$pId")
+        cacheMgr.getCache("foltia")?.evictIfPresent("subtitle:pId=$pId")
 
         return subtitle to (get(pId) ?: throw RuntimeException())
     }
