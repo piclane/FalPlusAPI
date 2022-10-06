@@ -3,7 +3,6 @@ package com.xxuz.piclane.foltiaapi.foltia
 import com.xxuz.piclane.foltiaapi.model.Subtitle
 import com.xxuz.piclane.foltiaapi.model.VideoType
 import java.io.File
-import java.io.FilenameFilter
 import java.net.URI
 
 /**
@@ -113,10 +112,8 @@ data class FoltiaConfig(
      *      サムネイルのファイルの存在に関わらずパスを取得する場合は false
      */
     fun thumbnailPath(subtitle: Subtitle, nullIfAbsent: Boolean = true): File? =
-        if(subtitle.m2pFilename == null)
-            null
-        else {
-            val thm = regexM2t.replace(subtitle.m2pFilename, "$1.THM")
+        subtitle.someFilename?.let { someFilename ->
+            val thm = regexM2t.replace(someFilename, "$1.THM")
             val file = programPath(subtitle.tId).resolve("mp4${File.separatorChar}MAQ-${thm}")
             if(!nullIfAbsent || file.exists()) file else null
         }
@@ -135,10 +132,8 @@ data class FoltiaConfig(
      * 動画全体のサムネイルへのパスを取得します
      */
     fun thumbnailPaths(subtitle: Subtitle): List<File>? =
-        if(subtitle.m2pFilename == null)
-            null
-        else {
-            val dirName = regexM2t.replace(subtitle.m2pFilename, "$1")
+        subtitle.someFilename?.let { someFilename ->
+            val dirName = regexM2t.replace(someFilename, "$1")
             val dir = programPath(subtitle.tId).resolve("img${File.separatorChar}${dirName}")
             if(dir.isDirectory) {
                 dir.listFiles { _, filename ->  filename.endsWith(".jpg") }?.asList()
@@ -157,10 +152,8 @@ data class FoltiaConfig(
      * dropInfo ファイルへのパスを取得します
      */
     fun dropInfoPath(subtitle: Subtitle): File? =
-        if(subtitle.m2pFilename == null)
-            null
-        else {
-            val dropInfo = regexM2t.replace(subtitle.m2pFilename, "$1-dropinfo.txt")
+        subtitle.someFilename?.let { someFilename ->
+            val dropInfo = regexM2t.replace(someFilename, "$1-dropinfo.txt")
             programPath(subtitle.tId).resolve("m2p${File.separatorChar}${dropInfo}")
         }
 
@@ -179,9 +172,15 @@ data class FoltiaConfig(
     }
 
     companion object {
-        private val regexM2t = Regex("""^(.+)\.m2t$""", RegexOption.IGNORE_CASE)
+        private val regexM2t = Regex("""^(?:MHD-|MAQ-)?(.+)\.(m2t|mp4)$""", RegexOption.IGNORE_CASE)
 
         /** デフォルトのバッファ時間 (秒) */
-        const val defaultBufferTime = 30;
+        const val defaultBufferTime = 30
     }
 }
+
+/**
+ * 何らかのファイル名を取得します
+ */
+private val Subtitle.someFilename: String?
+    get() = this.m2pFilename ?: (this.mp4hd ?: this.pspFilename)
